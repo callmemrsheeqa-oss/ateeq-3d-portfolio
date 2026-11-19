@@ -45,11 +45,11 @@ export function MagneticButton(props: MagneticButtonProps) {
 
   const variantClasses = {
     primary:
-      'bg-[#00D9FF] text-[#070B18] font-semibold hover:bg-[#3CE4FF] shadow-[0_10px_28px_rgba(0,217,255,0.24)]',
+      'bg-[var(--accent-primary)] text-[var(--accent-on-primary)] font-semibold hover:bg-[var(--accent-primary-hover)] shadow-[0_10px_28px_var(--glow-primary)]',
     secondary:
-      'bg-[#10182B]/90 text-[#F4F7FF] border border-[#F4F7FF]/18 font-medium hover:border-[#00D9FF]/55 hover:bg-[#10182B]',
+      'bg-[var(--bg-surface)] text-[var(--text-primary)] border border-[var(--border-subtle)] font-medium hover:border-[var(--border-accent)] hover:bg-[var(--bg-surface-hover)]',
     ghost:
-      'bg-transparent text-[#A6B2C9] border border-[#F4F7FF]/12 font-medium hover:text-[#F4F7FF] hover:border-[#F4F7FF]/30',
+      'bg-transparent text-[var(--text-secondary)] border border-[var(--border-subtle)] font-medium hover:text-[var(--text-primary)] hover:border-[var(--border-accent)]',
   }[variant];
 
   const baseClass = `inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm whitespace-nowrap shrink-0 transition-[transform,background-color,border-color,color,box-shadow] duration-200 ease-out cursor-pointer min-h-[42px] ${variantClasses} ${className}`;

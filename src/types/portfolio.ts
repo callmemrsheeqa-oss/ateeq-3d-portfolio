@@ -33,6 +33,7 @@ export interface SiteSettingsRecord {
   muavinEnabled: boolean;
   muavinWelcomeMessage: string;
   muavinSystemTone: string;
+  muavinSuggestedQuestions: string[];
   teachingHeadline: string;
   teachingSummary: string;
   teachingAudience: string;
@@ -180,6 +181,32 @@ export interface SocialLinkRecord {
   sortOrder: number;
 }
 
+export interface LearningItemRecord {
+  id: number;
+  indexLabel: string;
+  category: string;
+  title: string;
+  focus: string;
+  resources: string[];
+  status: string;
+  published: boolean;
+  sortOrder: number;
+}
+
+export interface JourneyMilestoneRecord {
+  id: number;
+  indexLabel: string;
+  period: string;
+  phase: string;
+  title: string;
+  organization: string;
+  location: string;
+  summary: string;
+  tags: string[];
+  published: boolean;
+  sortOrder: number;
+}
+
 export interface PublicPortfolioBundle {
   profile: ProfileRecord;
   settings: SiteSettingsRecord;
@@ -188,6 +215,8 @@ export interface PublicPortfolioBundle {
   educations: EducationRecord[];
   experiences: ExperienceRecord[];
   teachings: TeachingRecord[];
+  learningItems: LearningItemRecord[];
+  journeyMilestones: JourneyMilestoneRecord[];
   awards: AwardRecord[];
   certificates: CertificateRecord[];
   gallery: GalleryImageRecord[];

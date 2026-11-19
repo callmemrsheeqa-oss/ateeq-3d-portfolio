@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { useTheme } from '../../context/ThemeContext';
 import { useDeviceCapabilities } from '../../hooks/useDeviceCapabilities';
 import { FloatingSymbols } from './FloatingSymbols';
 import { ParticleField } from './ParticleField';
@@ -48,34 +49,40 @@ function StudioEnvironmentAndRig({
   return null;
 }
 
-function StaticMathFallback() {
+function StaticMathFallback({ isDark }: { isDark: boolean }) {
+  const bg = isDark ? '#0A0A0A' : '#F7FAFC';
+  const primary = isDark ? '#007BA7' : '#173B63';
+  const secondary = isDark ? '#FF2D95' : '#D81B78';
+
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-[#070B18]"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden transition-colors duration-300"
+      style={{ backgroundColor: bg }}
     >
       <div
         className="absolute inset-0"
         style={{
-          background:
-            'radial-gradient(circle at 72% 28%, rgba(0, 217, 255, 0.12), transparent 46%), radial-gradient(circle at 22% 76%, rgba(137, 87, 255, 0.12), transparent 50%)',
+          background: isDark
+            ? 'radial-gradient(circle at 74% 28%, rgba(0, 123, 167, 0.16), transparent 46%), radial-gradient(circle at 22% 76%, rgba(255, 45, 149, 0.11), transparent 50%)'
+            : 'radial-gradient(circle at 74% 28%, rgba(23, 59, 99, 0.10), transparent 46%), radial-gradient(circle at 22% 76%, rgba(216, 27, 120, 0.08), transparent 50%)',
         }}
       />
       <svg
         viewBox="0 0 1200 800"
-        className="h-full w-full opacity-25"
+        className={`h-full w-full ${isDark ? 'opacity-28' : 'opacity-22'}`}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <circle cx="840" cy="360" r="190" stroke="#00D9FF" strokeOpacity="0.45" strokeWidth="1" />
+        <circle cx="840" cy="360" r="190" stroke={primary} strokeOpacity="0.55" strokeWidth="1" />
         <ellipse
           cx="840"
           cy="360"
           rx="270"
           ry="95"
           transform="rotate(-24 840 360)"
-          stroke="#8957FF"
-          strokeOpacity="0.5"
+          stroke={secondary}
+          strokeOpacity="0.45"
           strokeWidth="1"
         />
         <ellipse
@@ -84,8 +91,8 @@ function StaticMathFallback() {
           rx="260"
           ry="110"
           transform="rotate(28 840 360)"
-          stroke="#00D9FF"
-          strokeOpacity="0.35"
+          stroke={primary}
+          strokeOpacity="0.38"
           strokeWidth="1"
         />
       </svg>
@@ -94,6 +101,8 @@ function StaticMathFallback() {
 }
 
 export function MathUniverse({ showHeroSculpture = false }: MathUniverseProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const { isMobile, reducedMotion, webglSupported, isSoftwareGl } = useDeviceCapabilities();
   const [contextLost, setContextLost] = useState(false);
   const pointerRef = useRef({ x: 0, y: 0 });
@@ -111,16 +120,18 @@ export function MathUniverse({ showHeroSculpture = false }: MathUniverseProps) {
   }, []);
 
   if (!webglSupported || contextLost) {
-    return <StaticMathFallback />;
+    return <StaticMathFallback isDark={isDark} />;
   }
 
-  const sculpturePos: [number, number, number] = isMobile ? [0, 1.35, -1.6] : [2.45, 0.15, -0.8];
-  const sculptureScale = isMobile ? 0.65 : 0.92;
+  const sculpturePos: [number, number, number] = isMobile ? [0, 1.35, -1.8] : [2.75, 0.25, -1.35];
+  const sculptureScale = isMobile ? 0.62 : 0.85;
+  const bgColor = isDark ? '#0A0A0A' : '#F7FAFC';
 
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-[#070B18]"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden transition-colors duration-300"
+      style={{ backgroundColor: bgColor }}
     >
       <Canvas
         dpr={isSoftwareGl ? 1 : [1, isMobile ? 1.5 : 2]}
@@ -133,7 +144,7 @@ export function MathUniverse({ showHeroSculpture = false }: MathUniverseProps) {
         onCreated={({ gl }) => {
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.08;
+          gl.toneMappingExposure = 1.06;
 
           const canvas = gl.domElement;
           const onLost = (event: Event) => {
@@ -147,21 +158,42 @@ export function MathUniverse({ showHeroSculpture = false }: MathUniverseProps) {
           canvas.addEventListener('webglcontextrestored', onRestored, false);
         }}
       >
-        <color attach="background" args={['#070B18']} />
-        <fogExp2 attach="fog" args={['#070B18', 0.042]} />
+        <color attach="background" args={[bgColor]} />
+        <fogExp2 attach="fog" args={[bgColor, isDark ? 0.042 : 0.036]} />
 
         <StudioEnvironmentAndRig pointerRef={pointerRef} reducedMotion={reducedMotion} />
 
-        {/* 3-Point studio lighting rig */}
-        <hemisphereLight args={['#94B8FF', '#10182B', 0.55]} />
-        <directionalLight position={[6, 7, 5]} intensity={1.35} color="#FFF4E6" />
-        <pointLight position={[-6, -4, 3]} intensity={18} color="#8957FF" distance={20} />
-        <pointLight position={[4, 2, 4]} intensity={16} color="#00D9FF" distance={18} />
+        {/* 3-Point studio lighting rig adapted for theme */}
+        <hemisphereLight
+          args={[
+            isDark ? '#88C8E8' : '#FFFFFF',
+            isDark ? '#15161B' : '#CBD8E8',
+            isDark ? 0.65 : 1.15,
+          ]}
+        />
+        <directionalLight
+          position={[6, 7, 5]}
+          intensity={isDark ? 1.35 : 1.55}
+          color={isDark ? '#FFF4E6' : '#FFFFFF'}
+        />
+        <pointLight
+          position={[-6, -4, 3]}
+          intensity={isDark ? 18 : 10}
+          color={isDark ? '#FF2D95' : '#D81B78'}
+          distance={20}
+        />
+        <pointLight
+          position={[4, 2, 4]}
+          intensity={isDark ? 18 : 12}
+          color={isDark ? '#007BA7' : '#173B63'}
+          distance={18}
+        />
 
         <ParticleField
           isMobile={isMobile}
           reducedMotion={reducedMotion}
           pointerRef={pointerRef}
+          isDark={isDark}
         />
 
         <FloatingSymbols
@@ -169,6 +201,7 @@ export function MathUniverse({ showHeroSculpture = false }: MathUniverseProps) {
           reducedMotion={reducedMotion}
           pointerRef={pointerRef}
           density={showHeroSculpture ? 'hero' : 'ambient'}
+          isDark={isDark}
         />
 
         {showHeroSculpture && (
@@ -177,16 +210,18 @@ export function MathUniverse({ showHeroSculpture = false }: MathUniverseProps) {
             pointerRef={pointerRef}
             position={sculpturePos}
             scale={sculptureScale}
+            isDark={isDark}
           />
         )}
       </Canvas>
 
-      {/* Subtle vignette so foreground typography retains high WCAG AA contrast */}
+      {/* Subtle theme-aware vignette for high WCAG AA legibility */}
       <div
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-0 transition-opacity duration-300"
         style={{
-          background:
-            'radial-gradient(circle at 28% 45%, rgba(7, 11, 24, 0.45) 0%, rgba(7, 11, 24, 0.25) 55%, rgba(7, 11, 24, 0.7) 100%)',
+          background: isDark
+            ? 'radial-gradient(circle at 28% 45%, rgba(10, 10, 10, 0.42) 0%, rgba(10, 10, 10, 0.24) 55%, rgba(10, 10, 10, 0.72) 100%)'
+            : 'radial-gradient(circle at 28% 45%, rgba(247, 250, 252, 0.56) 0%, rgba(247, 250, 252, 0.25) 55%, rgba(220, 229, 239, 0.55) 100%)',
         }}
       />
     </div>

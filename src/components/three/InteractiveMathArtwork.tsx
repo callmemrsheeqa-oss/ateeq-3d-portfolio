@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { useTheme } from '../../context/ThemeContext';
 import { useDeviceCapabilities } from '../../hooks/useDeviceCapabilities';
 import type { InterestArtworkMode } from '../../data/interests';
 import type { ProjectGeometryMotif } from '../../data/projects';
@@ -41,12 +42,16 @@ function TorusKnotSculpture({
   p = 2,
   q = 3,
   reducedMotion,
+  isDark,
 }: {
   p?: number;
   q?: number;
   reducedMotion: boolean;
+  isDark: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
+  const primaryHex = isDark ? '#007BA7' : '#173B63';
+  const secondaryHex = isDark ? '#FF2D95' : '#D81B78';
 
   useFrame((state) => {
     if (reducedMotion || !groupRef.current) return;
@@ -60,9 +65,9 @@ function TorusKnotSculpture({
       <mesh>
         <torusKnotGeometry args={[0.92, 0.24, 160, 24, p, q]} />
         <meshPhysicalMaterial
-          color="#16325C"
-          emissive="#00D9FF"
-          emissiveIntensity={0.28}
+          color={isDark ? '#152538' : '#173B63'}
+          emissive={primaryHex}
+          emissiveIntensity={isDark ? 0.35 : 0.14}
           metalness={0.85}
           roughness={0.18}
           clearcoat={0.9}
@@ -70,19 +75,36 @@ function TorusKnotSculpture({
       </mesh>
       <mesh>
         <torusKnotGeometry args={[0.92, 0.246, 96, 12, p, q]} />
-        <meshBasicMaterial color="#00D9FF" wireframe transparent opacity={0.22} />
+        <meshBasicMaterial
+          color={isDark ? '#38B6E6' : '#DCE5EF'}
+          wireframe
+          transparent
+          opacity={isDark ? 0.24 : 0.28}
+        />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[1.62, 0.015, 12, 96]} />
-        <meshStandardMaterial color="#8957FF" emissive="#8957FF" emissiveIntensity={0.45} />
+        <meshStandardMaterial
+          color={secondaryHex}
+          emissive={secondaryHex}
+          emissiveIntensity={isDark ? 0.45 : 0.2}
+        />
       </mesh>
     </group>
   );
 }
 
-function LorenzAttractorSculpture({ reducedMotion }: { reducedMotion: boolean }) {
+function LorenzAttractorSculpture({
+  reducedMotion,
+  isDark,
+}: {
+  reducedMotion: boolean;
+  isDark: boolean;
+}) {
   const groupRef = useRef<THREE.Group>(null);
   const particleRef = useRef<THREE.Mesh>(null);
+  const primaryHex = isDark ? '#007BA7' : '#173B63';
+  const secondaryHex = isDark ? '#FF2D95' : '#D81B78';
 
   const { tubeGeo, curve } = useMemo(() => {
     const pts: THREE.Vector3[] = [];
@@ -135,29 +157,41 @@ function LorenzAttractorSculpture({ reducedMotion }: { reducedMotion: boolean })
     <group ref={groupRef}>
       <mesh geometry={tubeGeo}>
         <meshStandardMaterial
-          color="#00D9FF"
-          emissive="#8957FF"
-          emissiveIntensity={0.42}
+          color={primaryHex}
+          emissive={secondaryHex}
+          emissiveIntensity={isDark ? 0.35 : 0.14}
           metalness={0.7}
           roughness={0.25}
         />
       </mesh>
       <mesh ref={particleRef}>
         <sphereGeometry args={[0.09, 16, 16]} />
-        <meshStandardMaterial color="#F4F7FF" emissive="#00D9FF" emissiveIntensity={1.1} />
+        <meshStandardMaterial
+          color={isDark ? '#F8FAFC' : '#D81B78'}
+          emissive={isDark ? '#38B6E6' : '#D81B78'}
+          emissiveIntensity={isDark ? 1.0 : 0.45}
+        />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -1.55, 0]}>
         <ringGeometry args={[1.45, 1.48, 64]} />
-        <meshBasicMaterial color="#00D9FF" transparent opacity={0.35} side={THREE.DoubleSide} />
+        <meshBasicMaterial color={primaryHex} transparent opacity={0.38} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
 }
 
-function PolyhedralSymmetrySculpture({ reducedMotion }: { reducedMotion: boolean }) {
+function PolyhedralSymmetrySculpture({
+  reducedMotion,
+  isDark,
+}: {
+  reducedMotion: boolean;
+  isDark: boolean;
+}) {
   const outerRef = useRef<THREE.Mesh>(null);
   const midRef = useRef<THREE.Mesh>(null);
   const innerRef = useRef<THREE.Mesh>(null);
+  const primaryHex = isDark ? '#007BA7' : '#173B63';
+  const secondaryHex = isDark ? '#FF2D95' : '#D81B78';
 
   useFrame((state) => {
     if (reducedMotion) return;
@@ -180,18 +214,18 @@ function PolyhedralSymmetrySculpture({ reducedMotion }: { reducedMotion: boolean
       <mesh ref={outerRef}>
         <dodecahedronGeometry args={[1.38, 0]} />
         <meshStandardMaterial
-          color="#00D9FF"
-          emissive="#00D9FF"
-          emissiveIntensity={0.3}
+          color={primaryHex}
+          emissive={primaryHex}
+          emissiveIntensity={isDark ? 0.32 : 0.1}
           wireframe
         />
       </mesh>
       <mesh ref={midRef}>
         <icosahedronGeometry args={[0.98, 0]} />
         <meshPhysicalMaterial
-          color="#1E1B4B"
-          emissive="#8957FF"
-          emissiveIntensity={0.32}
+          color={isDark ? '#1A1C28' : '#244A75'}
+          emissive={secondaryHex}
+          emissiveIntensity={isDark ? 0.28 : 0.14}
           metalness={0.85}
           roughness={0.2}
           transparent
@@ -201,20 +235,28 @@ function PolyhedralSymmetrySculpture({ reducedMotion }: { reducedMotion: boolean
       <mesh ref={innerRef}>
         <octahedronGeometry args={[0.52, 0]} />
         <meshStandardMaterial
-          color="#F4F7FF"
-          emissive="#00D9FF"
-          emissiveIntensity={0.65}
-          metalness={0.9}
-          roughness={0.15}
+          color={isDark ? '#F8FAFC' : '#D81B78'}
+          emissive={primaryHex}
+          emissiveIntensity={isDark ? 0.6 : 0.25}
+          metalness={0.88}
+          roughness={0.18}
         />
       </mesh>
     </group>
   );
 }
 
-function HarmonicWaveManifold({ reducedMotion }: { reducedMotion: boolean }) {
+function HarmonicWaveManifold({
+  reducedMotion,
+  isDark,
+}: {
+  reducedMotion: boolean;
+  isDark: boolean;
+}) {
   const meshRef = useRef<THREE.Mesh>(null);
   const basePositions = useRef<Float32Array | null>(null);
+  const primaryHex = isDark ? '#38B6E6' : '#173B63';
+  const secondaryHex = isDark ? '#FF2D95' : '#D81B78';
 
   const geometry = useMemo(() => {
     const geo = new THREE.PlaneGeometry(2.9, 2.9, 28, 28);
@@ -254,15 +296,19 @@ function HarmonicWaveManifold({ reducedMotion }: { reducedMotion: boolean }) {
     <group>
       <mesh ref={meshRef} geometry={geometry}>
         <meshStandardMaterial
-          color="#00D9FF"
-          emissive="#8957FF"
-          emissiveIntensity={0.32}
+          color={primaryHex}
+          emissive={isDark ? '#007BA7' : '#173B63'}
+          emissiveIntensity={isDark ? 0.35 : 0.1}
           wireframe
         />
       </mesh>
       <mesh position={[0, -0.5, 0]}>
         <torusGeometry args={[1.55, 0.015, 12, 72]} />
-        <meshStandardMaterial color="#8957FF" emissive="#8957FF" emissiveIntensity={0.4} />
+        <meshStandardMaterial
+          color={secondaryHex}
+          emissive={secondaryHex}
+          emissiveIntensity={isDark ? 0.42 : 0.18}
+        />
       </mesh>
     </group>
   );
@@ -273,30 +319,32 @@ function SculptureRouter({
   p,
   q,
   reducedMotion,
+  isDark,
 }: {
   variant: ArtworkVariant;
   p?: number;
   q?: number;
   reducedMotion: boolean;
+  isDark: boolean;
 }) {
   switch (variant) {
     case 'torus-knot':
     case 'harmonic-torus':
-      return <TorusKnotSculpture p={p} q={q} reducedMotion={reducedMotion} />;
+      return <TorusKnotSculpture p={p} q={q} reducedMotion={reducedMotion} isDark={isDark} />;
     case 'lorenz-flow':
     case 'neural-lattice':
     case 'vector-manifold':
-      return <LorenzAttractorSculpture reducedMotion={reducedMotion} />;
+      return <LorenzAttractorSculpture reducedMotion={reducedMotion} isDark={isDark} />;
     case 'polyhedral-lattice':
     case 'group-symmetry':
     case 'polyhedral-prism':
-      return <PolyhedralSymmetrySculpture reducedMotion={reducedMotion} />;
+      return <PolyhedralSymmetrySculpture reducedMotion={reducedMotion} isDark={isDark} />;
     case 'harmonic-wave':
     case 'orbital-wave':
     case 'simplex-frontier':
     case 'stochastic-grid':
     default:
-      return <HarmonicWaveManifold reducedMotion={reducedMotion} />;
+      return <HarmonicWaveManifold reducedMotion={reducedMotion} isDark={isDark} />;
   }
 }
 
@@ -307,21 +355,27 @@ export function InteractiveMathArtwork({
   parameterQ = 3,
   interactive = true,
 }: InteractiveMathArtworkProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const { reducedMotion, webglSupported, isSoftwareGl } = useDeviceCapabilities();
   const [lost, setLost] = useState(false);
 
   if (!webglSupported || lost) {
     return (
       <div
-        className={`${className} flex items-center justify-center rounded-xl border border-[#F4F7FF]/10 bg-[#10182B]/80`}
+        className={`${className} flex items-center justify-center rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]`}
       >
-        <span className="font-mono text-sm text-[#00D9FF]">Interactive 3D Manifold Preview</span>
+        <span className="font-mono text-sm text-[var(--accent-ink)]">
+          Interactive 3D Manifold Preview
+        </span>
       </div>
     );
   }
 
   return (
-    <div className={`${className} relative overflow-hidden rounded-xl border border-[#F4F7FF]/10 bg-[#070B18]/80`}>
+    <div
+      className={`${className} relative overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]`}
+    >
       <Canvas
         dpr={isSoftwareGl ? 1 : [1, 1.75]}
         camera={{ position: [0, 0.4, 4.4], fov: 44 }}
@@ -336,18 +390,33 @@ export function InteractiveMathArtwork({
           gl.domElement.addEventListener('webglcontextrestored', () => setLost(false));
         }}
       >
-        <color attach="background" args={['#080E20']} />
+        <color attach="background" args={[isDark ? '#0D0E12' : '#EEF4FA']} />
         <StudioEnv />
-        <hemisphereLight args={['#94B8FF', '#10182B', 0.65]} />
-        <directionalLight position={[4, 5, 4]} intensity={1.3} color="#FFF4E6" />
-        <pointLight position={[-4, -3, 3]} intensity={14} color="#8957FF" />
-        <pointLight position={[3, 2, 3]} intensity={12} color="#00D9FF" />
+        <hemisphereLight
+          args={[
+            isDark ? '#88C8E8' : '#FFFFFF',
+            isDark ? '#15161B' : '#CBD8E8',
+            isDark ? 0.75 : 1.15,
+          ]}
+        />
+        <directionalLight position={[4, 5, 4]} intensity={1.3} color="#FFFFFF" />
+        <pointLight
+          position={[-4, -3, 3]}
+          intensity={isDark ? 14 : 8}
+          color={isDark ? '#FF2D95' : '#D81B78'}
+        />
+        <pointLight
+          position={[3, 2, 3]}
+          intensity={isDark ? 12 : 9}
+          color={isDark ? '#007BA7' : '#173B63'}
+        />
 
         <SculptureRouter
           variant={variant}
           p={parameterP}
           q={parameterQ}
           reducedMotion={reducedMotion}
+          isDark={isDark}
         />
 
         {interactive && (

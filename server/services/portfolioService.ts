@@ -8,6 +8,8 @@ import {
   educations,
   experiences,
   galleryImages,
+  journeyMilestones,
+  learningItems,
   profiles,
   projects,
   siteSettings,
@@ -29,6 +31,8 @@ export async function getPublicPortfolioBundle() {
       educationRows,
       experienceRows,
       teachingRows,
+      learningRows,
+      journeyRows,
       awardRows,
       certificateRows,
       galleryRows,
@@ -62,6 +66,16 @@ export async function getPublicPortfolioBundle() {
         .from(teachings)
         .where(eq(teachings.published, true))
         .orderBy(asc(teachings.sortOrder), asc(teachings.id)),
+      db
+        .select()
+        .from(learningItems)
+        .where(eq(learningItems.published, true))
+        .orderBy(asc(learningItems.sortOrder), asc(learningItems.id)),
+      db
+        .select()
+        .from(journeyMilestones)
+        .where(eq(journeyMilestones.published, true))
+        .orderBy(asc(journeyMilestones.sortOrder), asc(journeyMilestones.id)),
       db
         .select()
         .from(awards)
@@ -104,6 +118,8 @@ export async function getPublicPortfolioBundle() {
       educations: educationRows,
       experiences: experienceRows,
       teachings: teachingRows,
+      learningItems: learningRows,
+      journeyMilestones: journeyRows,
       awards: awardRows,
       certificates: certificateRows,
       gallery: galleryRows.filter((img) => !img.isProfilePhoto),

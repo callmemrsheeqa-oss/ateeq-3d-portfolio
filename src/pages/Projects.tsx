@@ -37,11 +37,13 @@ export function Projects() {
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 lg:px-8 lg:pt-16">
         <header className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <p className="font-mono text-xs tracking-wider text-[#00D9FF]">PROJECT WORKBENCH</p>
-            <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#F4F7FF] sm:text-5xl">
+            <p className="font-mono text-xs tracking-wider text-[var(--accent-ink)]">
+              PROJECT WORKBENCH
+            </p>
+            <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl">
               Builds, experiments &amp; concepts.
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#A6B2C9]">
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
               Every entry below reflects its real stage—finished local or live applications are
               labeled as built, while ongoing studies and architectural concepts are marked
               transparently.
@@ -52,9 +54,9 @@ export function Projects() {
             href={githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-[#F4F7FF]/15 bg-[#10182B]/80 px-4 py-2.5 text-sm font-medium text-[#F4F7FF] hover:border-[#00D9FF]/45 transition-colors whitespace-nowrap shrink-0"
+            className="inline-flex items-center gap-2 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-2.5 text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-accent)] hover:bg-[var(--bg-surface-hover)] transition-colors whitespace-nowrap shrink-0"
           >
-            <Github className="h-4 w-4 text-[#00D9FF]" aria-hidden="true" />
+            <Github className="h-4 w-4 text-[var(--accent-ink)]" aria-hidden="true" />
             <span>GitHub Profile</span>
           </a>
         </header>
@@ -63,7 +65,7 @@ export function Projects() {
         <div
           role="tablist"
           aria-label="Filter projects by domain"
-          className="mt-10 inline-flex flex-wrap items-center gap-1.5 rounded-xl border border-[#F4F7FF]/12 bg-[#10182B]/75 p-1.5"
+          className="mt-10 inline-flex flex-wrap items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-1.5"
         >
           {categories.map((category) => {
             const selected = activeCategory === category;
@@ -81,8 +83,8 @@ export function Projects() {
                 onClick={() => setActiveCategory(category)}
                 className={`rounded-lg px-3.5 py-2 text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   selected
-                    ? 'bg-[#00D9FF] text-[#070B18] font-semibold'
-                    : 'text-[#A6B2C9] hover:text-[#F4F7FF]'
+                    ? 'bg-[var(--accent-primary)] text-[var(--accent-on-primary)] font-semibold'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 <span>{category}</span>

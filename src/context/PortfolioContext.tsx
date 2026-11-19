@@ -1,5 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import {
+  DEFAULT_JOURNEY_MILESTONES,
+  DEFAULT_LEARNING_ITEMS,
+  DEFAULT_MUAVIN_SUGGESTIONS,
   EXPERIENCE_TIMELINE,
   PROFILE,
   SKILL_GROUPS,
@@ -39,6 +42,7 @@ const FALLBACK_BUNDLE: PublicPortfolioBundle = {
     muavinWelcomeMessage:
       'Hello! I am Muavin AI, Ateeq Ur Rehman’s portfolio assistant. Ask me about his BS Mathematics studies at CASPAM (BZU), projects, teaching experience, skills, or contact details.',
     muavinSystemTone: 'Concise, accurate, and grounded.',
+    muavinSuggestedQuestions: DEFAULT_MUAVIN_SUGGESTIONS,
     teachingHeadline: TEACHING_PROFILE.headline,
     teachingSummary: TEACHING_PROFILE.summary,
     teachingAudience: TEACHING_PROFILE.audienceRange,
@@ -135,6 +139,30 @@ const FALLBACK_BUNDLE: PublicPortfolioBundle = {
     published: true,
     sortOrder: idx + 1,
   })),
+  learningItems: DEFAULT_LEARNING_ITEMS.map((item, idx) => ({
+    id: idx + 1,
+    indexLabel: item.index,
+    category: item.category,
+    title: item.title,
+    focus: item.focus,
+    resources: item.resources,
+    status: item.status,
+    published: true,
+    sortOrder: idx + 1,
+  })),
+  journeyMilestones: DEFAULT_JOURNEY_MILESTONES.map((m, idx) => ({
+    id: idx + 1,
+    indexLabel: m.index,
+    period: m.period,
+    phase: m.phase,
+    title: m.title,
+    organization: m.organization,
+    location: m.location,
+    summary: m.summary,
+    tags: m.tags,
+    published: true,
+    sortOrder: idx + 1,
+  })),
   awards: [],
   certificates: [],
   gallery: [],
@@ -177,12 +205,25 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
         const d = json.data as Partial<PublicPortfolioBundle>;
         setPortfolio((prev) => ({
           profile: d.profile || prev.profile,
-          settings: d.settings || prev.settings,
+          settings: d.settings
+            ? {
+                ...d.settings,
+                muavinSuggestedQuestions:
+                  Array.isArray(d.settings.muavinSuggestedQuestions) &&
+                  d.settings.muavinSuggestedQuestions.length > 0
+                    ? d.settings.muavinSuggestedQuestions
+                    : prev.settings.muavinSuggestedQuestions,
+              }
+            : prev.settings,
           projects: Array.isArray(d.projects) ? d.projects : prev.projects,
           skills: Array.isArray(d.skills) ? d.skills : prev.skills,
           educations: Array.isArray(d.educations) ? d.educations : prev.educations,
           experiences: Array.isArray(d.experiences) ? d.experiences : prev.experiences,
           teachings: Array.isArray(d.teachings) ? d.teachings : prev.teachings,
+          learningItems: Array.isArray(d.learningItems) ? d.learningItems : prev.learningItems,
+          journeyMilestones: Array.isArray(d.journeyMilestones)
+            ? d.journeyMilestones
+            : prev.journeyMilestones,
           awards: Array.isArray(d.awards) ? d.awards : [],
           certificates: Array.isArray(d.certificates) ? d.certificates : [],
           gallery: Array.isArray(d.gallery) ? d.gallery : [],

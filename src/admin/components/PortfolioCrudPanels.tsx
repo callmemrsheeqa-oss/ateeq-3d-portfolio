@@ -3,6 +3,8 @@ import { Eye, EyeOff, Pencil, Plus, Save, Star, Trash2, X } from 'lucide-react';
 import type {
   EducationRecord,
   ExperienceRecord,
+  JourneyMilestoneRecord,
+  LearningItemRecord,
   ProfileRecord,
   ProjectRecord,
   SiteSettingsRecord,
@@ -13,7 +15,13 @@ import type {
 export type NotifyFn = (type: 'success' | 'error', text: string) => void;
 
 const INPUT_CLASS =
-  'mt-1 w-full rounded-lg border border-[#F4F7FF]/15 bg-[#070B18] px-3 py-2 text-sm text-[#F4F7FF] placeholder-[#A6B2C9]/45 focus:border-[#00D9FF] focus:outline-none';
+  'mt-1 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-base)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/55 focus:border-[var(--accent-ink)] focus:outline-none';
+
+const CARD_CLASS =
+  'rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--panel-shadow)]';
+
+const PRIMARY_BTN_CLASS =
+  'inline-flex items-center gap-2 rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-xs font-semibold text-[var(--accent-on-primary)] hover:bg-[var(--accent-primary-hover)] disabled:opacity-50 cursor-pointer transition-colors';
 
 /* ==================== PROFILE & SETTINGS PANEL ==================== */
 export function ProfileSettingsPanel({
@@ -32,7 +40,10 @@ export function ProfileSettingsPanel({
     rotatingRolesText: profile.rotatingRoles.join(', '),
     aboutStoryText: profile.aboutStory.join('\n\n'),
   });
-  const [sForm, setSForm] = useState({ ...settings });
+  const [sForm, setSForm] = useState({
+    ...settings,
+    muavinSuggestedQuestionsText: (settings.muavinSuggestedQuestions || []).join('\n'),
+  });
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
 
@@ -45,7 +56,10 @@ export function ProfileSettingsPanel({
   }, [profile]);
 
   useEffect(() => {
-    setSForm({ ...settings });
+    setSForm({
+      ...settings,
+      muavinSuggestedQuestionsText: (settings.muavinSuggestedQuestions || []).join('\n'),
+    });
   }, [settings]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -84,11 +98,19 @@ export function ProfileSettingsPanel({
     e.preventDefault();
     setSavingSettings(true);
     try {
+      const suggestedQuestions = sForm.muavinSuggestedQuestionsText
+        .split('\n')
+        .map((q) => q.trim())
+        .filter(Boolean);
+
       const res = await fetch('/api/admin/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(sForm),
+        body: JSON.stringify({
+          ...sForm,
+          muavinSuggestedQuestions: suggestedQuestions,
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
@@ -104,31 +126,24 @@ export function ProfileSettingsPanel({
 
   return (
     <div className="space-y-8">
-      <form
-        onSubmit={handleSaveProfile}
-        className="rounded-2xl border border-[#F4F7FF]/12 bg-[#10182B] p-6 space-y-5"
-      >
-        <div className="flex items-center justify-between gap-4 border-b border-[#F4F7FF]/10 pb-4">
+      <form onSubmit={handleSaveProfile} className={`${CARD_CLASS} space-y-5`}>
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border-subtle)] pb-4">
           <div>
-            <h2 className="font-display text-xl font-semibold text-[#F4F7FF]">
+            <h2 className="font-display text-xl font-semibold text-[var(--text-primary)]">
               Profile Information
             </h2>
-            <p className="text-xs text-[#A6B2C9]">
+            <p className="text-xs text-[var(--text-secondary)]">
               Public identity, hero rotating roles, academic headline, and story paragraphs.
             </p>
           </div>
-          <button
-            type="submit"
-            disabled={savingProfile}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#00D9FF] px-4 py-2 text-xs font-semibold text-[#070B18] hover:bg-[#3CE4FF] disabled:opacity-50 cursor-pointer"
-          >
+          <button type="submit" disabled={savingProfile} className={PRIMARY_BTN_CLASS}>
             <Save className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{savingProfile ? 'Saving...' : 'Save Profile'}</span>
           </button>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Full Name
             <input
               className={INPUT_CLASS}
@@ -136,7 +151,7 @@ export function ProfileSettingsPanel({
               onChange={(e) => setPForm({ ...pForm, name: e.target.value })}
             />
           </label>
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Initials
             <input
               className={INPUT_CLASS}
@@ -145,7 +160,7 @@ export function ProfileSettingsPanel({
               onChange={(e) => setPForm({ ...pForm, initials: e.target.value })}
             />
           </label>
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Email
             <input
               className={INPUT_CLASS}
@@ -154,7 +169,7 @@ export function ProfileSettingsPanel({
               onChange={(e) => setPForm({ ...pForm, email: e.target.value })}
             />
           </label>
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Location
             <input
               className={INPUT_CLASS}
@@ -162,7 +177,7 @@ export function ProfileSettingsPanel({
               onChange={(e) => setPForm({ ...pForm, location: e.target.value })}
             />
           </label>
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Coordinates
             <input
               className={INPUT_CLASS}
@@ -170,7 +185,7 @@ export function ProfileSettingsPanel({
               onChange={(e) => setPForm({ ...pForm, coordinates: e.target.value })}
             />
           </label>
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Degree / Semester
             <input
               className={INPUT_CLASS}
@@ -180,7 +195,7 @@ export function ProfileSettingsPanel({
           </label>
         </div>
 
-        <label className="block text-xs text-[#A6B2C9]">
+        <label className="block text-xs text-[var(--text-secondary)]">
           Hero Tagline
           <textarea
             rows={2}
@@ -190,7 +205,7 @@ export function ProfileSettingsPanel({
           />
         </label>
 
-        <label className="block text-xs text-[#A6B2C9]">
+        <label className="block text-xs text-[var(--text-secondary)]">
           Rotating Roles (comma-separated)
           <input
             className={INPUT_CLASS}
@@ -199,7 +214,7 @@ export function ProfileSettingsPanel({
           />
         </label>
 
-        <label className="block text-xs text-[#A6B2C9]">
+        <label className="block text-xs text-[var(--text-secondary)]">
           Philosophy Quote
           <input
             className={INPUT_CLASS}
@@ -208,7 +223,7 @@ export function ProfileSettingsPanel({
           />
         </label>
 
-        <label className="block text-xs text-[#A6B2C9]">
+        <label className="block text-xs text-[var(--text-secondary)]">
           About Story (separate paragraphs with a blank line)
           <textarea
             rows={5}
@@ -219,31 +234,25 @@ export function ProfileSettingsPanel({
         </label>
       </form>
 
-      <form
-        onSubmit={handleSaveSettings}
-        className="rounded-2xl border border-[#F4F7FF]/12 bg-[#10182B] p-6 space-y-5"
-      >
-        <div className="flex items-center justify-between gap-4 border-b border-[#F4F7FF]/10 pb-4">
+      <form onSubmit={handleSaveSettings} className={`${CARD_CLASS} space-y-5`}>
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border-subtle)] pb-4">
           <div>
-            <h2 className="font-display text-xl font-semibold text-[#F4F7FF]">
+            <h2 className="font-display text-xl font-semibold text-[var(--text-primary)]">
               Teaching Overview &amp; Muavin AI Settings
             </h2>
-            <p className="text-xs text-[#A6B2C9]">
-              Control site-wide labels, teaching page metadata, and Muavin AI behavior.
+            <p className="text-xs text-[var(--text-secondary)]">
+              Control site-wide labels, teaching metadata, and persistent Muavin AI quick
+              questions.
             </p>
           </div>
-          <button
-            type="submit"
-            disabled={savingSettings}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#00D9FF] px-4 py-2 text-xs font-semibold text-[#070B18] hover:bg-[#3CE4FF] disabled:opacity-50 cursor-pointer"
-          >
+          <button type="submit" disabled={savingSettings} className={PRIMARY_BTN_CLASS}>
             <Save className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{savingSettings ? 'Saving...' : 'Save Settings'}</span>
           </button>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Teaching Headline
             <input
               className={INPUT_CLASS}
@@ -251,7 +260,7 @@ export function ProfileSettingsPanel({
               onChange={(e) => setSForm({ ...sForm, teachingHeadline: e.target.value })}
             />
           </label>
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Audience Range
             <input
               className={INPUT_CLASS}
@@ -259,7 +268,7 @@ export function ProfileSettingsPanel({
               onChange={(e) => setSForm({ ...sForm, teachingAudience: e.target.value })}
             />
           </label>
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Experience Label
             <input
               className={INPUT_CLASS}
@@ -267,7 +276,7 @@ export function ProfileSettingsPanel({
               onChange={(e) => setSForm({ ...sForm, teachingExperienceLabel: e.target.value })}
             />
           </label>
-          <label className="text-xs text-[#A6B2C9]">
+          <label className="text-xs text-[var(--text-secondary)]">
             Teaching Mode
             <input
               className={INPUT_CLASS}
@@ -277,7 +286,7 @@ export function ProfileSettingsPanel({
           </label>
         </div>
 
-        <label className="block text-xs text-[#A6B2C9]">
+        <label className="block text-xs text-[var(--text-secondary)]">
           Teaching Summary
           <textarea
             rows={2}
@@ -287,19 +296,19 @@ export function ProfileSettingsPanel({
           />
         </label>
 
-        <div className="rounded-xl border border-[#00D9FF]/25 bg-[#070B18]/75 p-4 space-y-4">
-          <label className="flex items-center gap-3 text-sm font-medium text-[#F4F7FF] cursor-pointer">
+        <div className="rounded-xl border border-[var(--border-accent)] bg-[var(--bg-base)] p-4 space-y-4">
+          <label className="flex items-center gap-3 text-sm font-medium text-[var(--text-primary)] cursor-pointer">
             <input
               type="checkbox"
               checked={sForm.muavinEnabled}
               onChange={(e) => setSForm({ ...sForm, muavinEnabled: e.target.checked })}
-              className="h-4 w-4 accent-[#00D9FF]"
+              className="h-4 w-4 accent-[var(--accent-primary)]"
             />
             <span>Enable Muavin AI Public Chat Assistant</span>
           </label>
 
-          <label className="block text-xs text-[#A6B2C9]">
-            Muavin Welcome Message
+          <label className="block text-xs text-[var(--text-secondary)]">
+            Muavin Welcome Message (English)
             <textarea
               rows={2}
               className={INPUT_CLASS}
@@ -308,12 +317,26 @@ export function ProfileSettingsPanel({
             />
           </label>
 
-          <label className="block text-xs text-[#A6B2C9]">
+          <label className="block text-xs text-[var(--text-secondary)]">
             Muavin System Tone Instruction
             <input
               className={INPUT_CLASS}
               value={sForm.muavinSystemTone}
               onChange={(e) => setSForm({ ...sForm, muavinSystemTone: e.target.value })}
+            />
+          </label>
+
+          <label className="block text-xs text-[var(--text-secondary)]">
+            Muavin Suggested Quick Questions (one question per line — stays permanently above chat
+            input)
+            <textarea
+              rows={5}
+              className={INPUT_CLASS}
+              placeholder="Who is Ateeq Ur Rehman?&#10;What projects has Ateeq built?&#10;How can I contact Ateeq?"
+              value={sForm.muavinSuggestedQuestionsText}
+              onChange={(e) =>
+                setSForm({ ...sForm, muavinSuggestedQuestionsText: e.target.value })
+              }
             />
           </label>
         </div>
@@ -438,18 +461,14 @@ export function ProjectsPanel({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="font-display text-xl font-semibold text-[#F4F7FF]">
+          <h2 className="font-display text-xl font-semibold text-[var(--text-primary)]">
             Projects ({items.length})
           </h2>
-          <p className="text-xs text-[#A6B2C9]">
+          <p className="text-xs text-[var(--text-secondary)]">
             Add, edit, feature, publish/unpublish, or remove portfolio projects.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={openNew}
-          className="inline-flex items-center gap-2 rounded-lg bg-[#00D9FF] px-4 py-2 text-xs font-semibold text-[#070B18] hover:bg-[#3CE4FF] cursor-pointer"
-        >
+        <button type="button" onClick={openNew} className={PRIMARY_BTN_CLASS}>
           <Plus className="h-4 w-4" aria-hidden="true" />
           <span>Add Project</span>
         </button>
@@ -458,23 +477,23 @@ export function ProjectsPanel({
       {editing && (
         <form
           onSubmit={save}
-          className="rounded-2xl border border-[#00D9FF]/35 bg-[#10182B] p-6 space-y-4"
+          className="rounded-2xl border border-[var(--border-accent)] bg-[var(--bg-surface)] p-6 space-y-4"
         >
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-[#F4F7FF]">
+            <h3 className="font-semibold text-[var(--text-primary)]">
               {editing.id ? `Edit: ${editing.title}` : 'New Project'}
             </h3>
             <button
               type="button"
               onClick={() => setEditing(null)}
-              className="text-[#A6B2C9] hover:text-[#F4F7FF] cursor-pointer"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Title *
               <input
                 required
@@ -483,7 +502,7 @@ export function ProjectsPanel({
                 onChange={(e) => setEditing({ ...editing, title: e.target.value })}
               />
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Slug (optional)
               <input
                 className={INPUT_CLASS}
@@ -491,7 +510,7 @@ export function ProjectsPanel({
                 onChange={(e) => setEditing({ ...editing, slug: e.target.value })}
               />
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Category
               <select
                 className={INPUT_CLASS}
@@ -504,7 +523,7 @@ export function ProjectsPanel({
                 <option value="Concepts">Concepts</option>
               </select>
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Status
               <input
                 className={INPUT_CLASS}
@@ -512,7 +531,7 @@ export function ProjectsPanel({
                 onChange={(e) => setEditing({ ...editing, status: e.target.value })}
               />
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Math Symbol
               <input
                 className={INPUT_CLASS}
@@ -520,7 +539,7 @@ export function ProjectsPanel({
                 onChange={(e) => setEditing({ ...editing, mathSymbol: e.target.value })}
               />
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               3D Motif
               <select
                 className={INPUT_CLASS}
@@ -539,7 +558,7 @@ export function ProjectsPanel({
             </label>
           </div>
 
-          <label className="block text-xs text-[#A6B2C9]">
+          <label className="block text-xs text-[var(--text-secondary)]">
             Tagline *
             <input
               required
@@ -548,7 +567,7 @@ export function ProjectsPanel({
               onChange={(e) => setEditing({ ...editing, tagline: e.target.value })}
             />
           </label>
-          <label className="block text-xs text-[#A6B2C9]">
+          <label className="block text-xs text-[var(--text-secondary)]">
             Summary
             <textarea
               rows={2}
@@ -558,7 +577,7 @@ export function ProjectsPanel({
             />
           </label>
           <div className="grid gap-4 sm:grid-cols-3">
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Problem
               <textarea
                 rows={3}
@@ -567,7 +586,7 @@ export function ProjectsPanel({
                 onChange={(e) => setEditing({ ...editing, problem: e.target.value })}
               />
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Approach
               <textarea
                 rows={3}
@@ -576,7 +595,7 @@ export function ProjectsPanel({
                 onChange={(e) => setEditing({ ...editing, approach: e.target.value })}
               />
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Mathematical Link
               <textarea
                 rows={3}
@@ -589,7 +608,7 @@ export function ProjectsPanel({
             </label>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Tech Stack (comma-separated)
               <input
                 className={INPUT_CLASS}
@@ -597,7 +616,7 @@ export function ProjectsPanel({
                 onChange={(e) => setTechText(e.target.value)}
               />
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Key Features (one per line)
               <textarea
                 rows={3}
@@ -606,7 +625,7 @@ export function ProjectsPanel({
                 onChange={(e) => setFeaturesText(e.target.value)}
               />
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               GitHub URL
               <input
                 className={INPUT_CLASS}
@@ -614,7 +633,7 @@ export function ProjectsPanel({
                 onChange={(e) => setEditing({ ...editing, githubUrl: e.target.value })}
               />
             </label>
-            <label className="text-xs text-[#A6B2C9]">
+            <label className="text-xs text-[var(--text-secondary)]">
               Live Demo URL
               <input
                 className={INPUT_CLASS}
@@ -625,28 +644,25 @@ export function ProjectsPanel({
           </div>
 
           <div className="flex flex-wrap items-center gap-6 pt-2">
-            <label className="flex items-center gap-2 text-xs text-[#F4F7FF] cursor-pointer">
+            <label className="flex items-center gap-2 text-xs text-[var(--text-primary)] cursor-pointer">
               <input
                 type="checkbox"
                 checked={Boolean(editing.featured)}
                 onChange={(e) => setEditing({ ...editing, featured: e.target.checked })}
-                className="accent-[#00D9FF]"
+                className="accent-[var(--accent-primary)]"
               />
               <span>Featured on Home</span>
             </label>
-            <label className="flex items-center gap-2 text-xs text-[#F4F7FF] cursor-pointer">
+            <label className="flex items-center gap-2 text-xs text-[var(--text-primary)] cursor-pointer">
               <input
                 type="checkbox"
                 checked={editing.published !== false}
                 onChange={(e) => setEditing({ ...editing, published: e.target.checked })}
-                className="accent-[#00D9FF]"
+                className="accent-[var(--accent-primary)]"
               />
               <span>Published</span>
             </label>
-            <button
-              type="submit"
-              className="ml-auto inline-flex items-center gap-2 rounded-lg bg-[#00D9FF] px-4 py-2 text-xs font-semibold text-[#070B18] cursor-pointer"
-            >
+            <button type="submit" className={`ml-auto ${PRIMARY_BTN_CLASS}`}>
               <Save className="h-3.5 w-3.5" />
               <span>Save Project</span>
             </button>
@@ -658,22 +674,26 @@ export function ProjectsPanel({
         {items.map((p) => (
           <div
             key={p.id}
-            className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#F4F7FF]/10 bg-[#10182B] px-5 py-4"
+            className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-5 py-4"
           >
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[#A6B2C9]">
-                <span className="text-[#00D9FF]">{p.indexLabel}</span>
+              <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[var(--text-secondary)]">
+                <span className="text-[var(--accent-ink)]">{p.indexLabel}</span>
                 <span>· {p.category}</span>
                 <span>· {p.status}</span>
                 {p.featured && (
-                  <span className="inline-flex items-center gap-1 text-[#00D9FF]">
+                  <span className="inline-flex items-center gap-1 text-[var(--accent-secondary-ink)]">
                     <Star className="h-3 w-3" /> Featured
                   </span>
                 )}
-                {!p.published && <span className="text-amber-300">· Draft</span>}
+                {!p.published && (
+                  <span className="text-amber-600 dark:text-amber-300">· Draft</span>
+                )}
               </div>
-              <h3 className="mt-1 truncate text-base font-semibold text-[#F4F7FF]">{p.title}</h3>
-              <p className="truncate text-xs text-[#A6B2C9]">{p.tagline}</p>
+              <h3 className="mt-1 truncate text-base font-semibold text-[var(--text-primary)]">
+                {p.title}
+              </h3>
+              <p className="truncate text-xs text-[var(--text-secondary)]">{p.tagline}</p>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
@@ -681,7 +701,7 @@ export function ProjectsPanel({
                 type="button"
                 onClick={() => togglePublish(p)}
                 title={p.published ? 'Unpublish' : 'Publish'}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#F4F7FF]/12 text-[#A6B2C9] hover:border-[#00D9FF]/45 hover:text-[#F4F7FF] cursor-pointer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-[var(--text-primary)] cursor-pointer"
               >
                 {p.published ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
               </button>
@@ -689,7 +709,7 @@ export function ProjectsPanel({
                 type="button"
                 onClick={() => openEdit(p)}
                 aria-label={`Edit ${p.title}`}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#F4F7FF]/12 text-[#A6B2C9] hover:border-[#00D9FF]/45 hover:text-[#00D9FF] cursor-pointer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-[var(--accent-ink)] cursor-pointer"
               >
                 <Pencil className="h-4 w-4" />
               </button>
@@ -697,7 +717,7 @@ export function ProjectsPanel({
                 type="button"
                 onClick={() => remove(p.id)}
                 aria-label={`Delete ${p.title}`}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#F4F7FF]/12 text-[#A6B2C9] hover:border-rose-400/50 hover:text-rose-400 cursor-pointer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-rose-400/50 hover:text-rose-500 cursor-pointer"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -709,13 +729,30 @@ export function ProjectsPanel({
   );
 }
 
-/* ==================== SKILLS, EDUCATION, EXPERIENCE & TEACHING PANEL ==================== */
+/* ==================== SKILLS, EDUCATION, EXPERIENCE, TEACHING, LEARNING & JOURNEY PANEL ==================== */
+export type AcademicSection =
+  | 'skills'
+  | 'educations'
+  | 'experiences'
+  | 'teachings'
+  | 'learning'
+  | 'journey';
+
+const SECTION_LABELS: Record<AcademicSection, string> = {
+  skills: 'Skills',
+  educations: 'Education',
+  experiences: 'Experience',
+  teachings: 'Teaching',
+  learning: 'Learning Focus Areas',
+  journey: 'Journey Milestones',
+};
+
 export function AcademicPanels({
   section,
   onSaved,
   notify,
 }: {
-  section: 'skills' | 'educations' | 'experiences' | 'teachings';
+  section: AcademicSection;
   onSaved: () => Promise<void>;
   notify: NotifyFn;
 }) {
@@ -723,6 +760,8 @@ export function AcademicPanels({
   const [educations, setEducations] = useState<EducationRecord[]>([]);
   const [experiences, setExperiences] = useState<ExperienceRecord[]>([]);
   const [teachings, setTeachings] = useState<TeachingRecord[]>([]);
+  const [learning, setLearning] = useState<LearningItemRecord[]>([]);
+  const [journey, setJourney] = useState<JourneyMilestoneRecord[]>([]);
   const [draft, setDraft] = useState<Record<string, unknown> | null>(null);
 
   const loadAll = async () => {
@@ -734,6 +773,8 @@ export function AcademicPanels({
     if (section === 'educations') setEducations(data.items || []);
     if (section === 'experiences') setExperiences(data.items || []);
     if (section === 'teachings') setTeachings(data.items || []);
+    if (section === 'learning') setLearning(data.items || []);
+    if (section === 'journey') setJourney(data.items || []);
   };
 
   useEffect(() => {
@@ -782,29 +823,95 @@ export function AcademicPanels({
         ? educations
         : section === 'experiences'
           ? experiences
-          : teachings;
+          : section === 'teachings'
+            ? teachings
+            : section === 'learning'
+              ? learning
+              : journey;
+
+  const openNewDraft = () => {
+    const nextIdx = String(items.length + 1).padStart(2, '0');
+    if (section === 'skills') {
+      setDraft({
+        indexLabel: nextIdx,
+        title: '',
+        domain: '',
+        symbol: '∑',
+        topics: '',
+        contextLabel: 'Active',
+        published: true,
+        sortOrder: items.length + 1,
+      });
+    } else if (section === 'educations') {
+      setDraft({
+        degree: '',
+        institution: '',
+        department: '',
+        location: 'Multan, Pakistan',
+        period: '',
+        semesterOrGrade: '',
+        description: '',
+        published: true,
+        sortOrder: items.length + 1,
+      });
+    } else if (section === 'experiences') {
+      setDraft({
+        indexLabel: nextIdx,
+        title: '',
+        organization: '',
+        category: 'Experience',
+        period: '',
+        location: 'Multan, Pakistan',
+        summary: '',
+        highlights: '',
+        takeaway: '',
+        published: true,
+        sortOrder: items.length + 1,
+      });
+    } else if (section === 'teachings') {
+      setDraft({
+        indexLabel: nextIdx,
+        level: '',
+        title: '',
+        focus: '',
+        topics: '',
+        published: true,
+        sortOrder: items.length + 1,
+      });
+    } else if (section === 'learning') {
+      setDraft({
+        indexLabel: nextIdx,
+        category: 'Mathematics',
+        title: '',
+        focus: '',
+        resources: '',
+        status: 'Active Study',
+        published: true,
+        sortOrder: items.length + 1,
+      });
+    } else {
+      setDraft({
+        indexLabel: nextIdx,
+        period: '',
+        phase: 'Milestone',
+        title: '',
+        organization: '',
+        location: 'Multan, Pakistan',
+        summary: '',
+        tags: '',
+        published: true,
+        sortOrder: items.length + 1,
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-display text-xl font-semibold capitalize text-[#F4F7FF]">
-          {section} ({items.length})
+        <h2 className="font-display text-xl font-semibold text-[var(--text-primary)]">
+          {SECTION_LABELS[section]} ({items.length})
         </h2>
-        <button
-          type="button"
-          onClick={() =>
-            setDraft(
-              section === 'skills'
-                ? { title: '', domain: '', symbol: '∑', topics: '', contextLabel: 'Active', published: true }
-                : section === 'educations'
-                  ? { degree: '', institution: '', department: '', location: 'Multan, Pakistan', period: '', semesterOrGrade: '', description: '', published: true }
-                  : section === 'experiences'
-                    ? { title: '', organization: '', category: 'Experience', period: '', location: 'Multan, Pakistan', summary: '', highlights: '', takeaway: '', published: true }
-                    : { level: '', title: '', focus: '', topics: '', published: true },
-            )
-          }
-          className="inline-flex items-center gap-2 rounded-lg bg-[#00D9FF] px-4 py-2 text-xs font-semibold text-[#070B18] cursor-pointer"
-        >
+        <button type="button" onClick={openNewDraft} className={PRIMARY_BTN_CLASS}>
           <Plus className="h-4 w-4" />
           <span>Add Entry</span>
         </button>
@@ -813,146 +920,398 @@ export function AcademicPanels({
       {draft && (
         <form
           onSubmit={submitDraft}
-          className="rounded-2xl border border-[#00D9FF]/35 bg-[#10182B] p-6 space-y-4"
+          className="rounded-2xl border border-[var(--border-accent)] bg-[var(--bg-surface)] p-6 space-y-4"
         >
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-[#F4F7FF]">
+            <h3 className="font-semibold text-[var(--text-primary)]">
               {draft.id ? 'Edit Entry' : 'New Entry'}
             </h3>
-            <button type="button" onClick={() => setDraft(null)} className="text-[#A6B2C9] cursor-pointer">
+            <button
+              type="button"
+              onClick={() => setDraft(null)}
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
 
           {section === 'skills' && (
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Title *
-                <input required className={INPUT_CLASS} value={String(draft.title || '')} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.title || '')}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Domain *
-                <input required className={INPUT_CLASS} value={String(draft.domain || '')} onChange={(e) => setDraft({ ...draft, domain: e.target.value })} />
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.domain || '')}
+                  onChange={(e) => setDraft({ ...draft, domain: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Symbol
-                <input className={INPUT_CLASS} value={String(draft.symbol || '')} onChange={(e) => setDraft({ ...draft, symbol: e.target.value })} />
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.symbol || '')}
+                  onChange={(e) => setDraft({ ...draft, symbol: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Topics (comma-separated)
                 <input
                   className={INPUT_CLASS}
-                  value={Array.isArray(draft.topics) ? draft.topics.join(', ') : String(draft.topics || '')}
+                  value={
+                    Array.isArray(draft.topics)
+                      ? draft.topics.join(', ')
+                      : String(draft.topics || '')
+                  }
                   onChange={(e) => setDraft({ ...draft, topics: e.target.value })}
                 />
               </label>
-              <label className="sm:col-span-2 text-xs text-[#A6B2C9]">
+              <label className="sm:col-span-2 text-xs text-[var(--text-secondary)]">
                 Description
-                <textarea rows={2} className={INPUT_CLASS} value={String(draft.description || '')} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
+                <textarea
+                  rows={2}
+                  className={INPUT_CLASS}
+                  value={String(draft.description || '')}
+                  onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                />
               </label>
             </div>
           )}
 
           {section === 'educations' && (
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Degree *
-                <input required className={INPUT_CLASS} value={String(draft.degree || '')} onChange={(e) => setDraft({ ...draft, degree: e.target.value })} />
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.degree || '')}
+                  onChange={(e) => setDraft({ ...draft, degree: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Institution *
-                <input required className={INPUT_CLASS} value={String(draft.institution || '')} onChange={(e) => setDraft({ ...draft, institution: e.target.value })} />
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.institution || '')}
+                  onChange={(e) => setDraft({ ...draft, institution: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Department
-                <input className={INPUT_CLASS} value={String(draft.department || '')} onChange={(e) => setDraft({ ...draft, department: e.target.value })} />
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.department || '')}
+                  onChange={(e) => setDraft({ ...draft, department: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Period
-                <input className={INPUT_CLASS} value={String(draft.period || '')} onChange={(e) => setDraft({ ...draft, period: e.target.value })} />
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.period || '')}
+                  onChange={(e) => setDraft({ ...draft, period: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Semester / Grade
-                <input className={INPUT_CLASS} value={String(draft.semesterOrGrade || '')} onChange={(e) => setDraft({ ...draft, semesterOrGrade: e.target.value })} />
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.semesterOrGrade || '')}
+                  onChange={(e) => setDraft({ ...draft, semesterOrGrade: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Location
-                <input className={INPUT_CLASS} value={String(draft.location || '')} onChange={(e) => setDraft({ ...draft, location: e.target.value })} />
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.location || '')}
+                  onChange={(e) => setDraft({ ...draft, location: e.target.value })}
+                />
               </label>
-              <label className="sm:col-span-2 text-xs text-[#A6B2C9]">
+              <label className="sm:col-span-2 text-xs text-[var(--text-secondary)]">
                 Description
-                <textarea rows={2} className={INPUT_CLASS} value={String(draft.description || '')} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
+                <textarea
+                  rows={2}
+                  className={INPUT_CLASS}
+                  value={String(draft.description || '')}
+                  onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                />
               </label>
             </div>
           )}
 
           {section === 'experiences' && (
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Role / Title *
-                <input required className={INPUT_CLASS} value={String(draft.title || '')} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.title || '')}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Organization *
-                <input required className={INPUT_CLASS} value={String(draft.organization || '')} onChange={(e) => setDraft({ ...draft, organization: e.target.value })} />
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.organization || '')}
+                  onChange={(e) => setDraft({ ...draft, organization: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Category
-                <input className={INPUT_CLASS} value={String(draft.category || '')} onChange={(e) => setDraft({ ...draft, category: e.target.value })} />
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.category || '')}
+                  onChange={(e) => setDraft({ ...draft, category: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Period
-                <input className={INPUT_CLASS} value={String(draft.period || '')} onChange={(e) => setDraft({ ...draft, period: e.target.value })} />
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.period || '')}
+                  onChange={(e) => setDraft({ ...draft, period: e.target.value })}
+                />
               </label>
-              <label className="sm:col-span-2 text-xs text-[#A6B2C9]">
+              <label className="sm:col-span-2 text-xs text-[var(--text-secondary)]">
                 Summary
-                <textarea rows={2} className={INPUT_CLASS} value={String(draft.summary || '')} onChange={(e) => setDraft({ ...draft, summary: e.target.value })} />
+                <textarea
+                  rows={2}
+                  className={INPUT_CLASS}
+                  value={String(draft.summary || '')}
+                  onChange={(e) => setDraft({ ...draft, summary: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Highlights (comma-separated)
                 <input
                   className={INPUT_CLASS}
-                  value={Array.isArray(draft.highlights) ? draft.highlights.join(', ') : String(draft.highlights || '')}
+                  value={
+                    Array.isArray(draft.highlights)
+                      ? draft.highlights.join(', ')
+                      : String(draft.highlights || '')
+                  }
                   onChange={(e) => setDraft({ ...draft, highlights: e.target.value })}
                 />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Takeaway
-                <input className={INPUT_CLASS} value={String(draft.takeaway || '')} onChange={(e) => setDraft({ ...draft, takeaway: e.target.value })} />
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.takeaway || '')}
+                  onChange={(e) => setDraft({ ...draft, takeaway: e.target.value })}
+                />
               </label>
             </div>
           )}
 
           {section === 'teachings' && (
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Grade Level *
-                <input required className={INPUT_CLASS} value={String(draft.level || '')} onChange={(e) => setDraft({ ...draft, level: e.target.value })} />
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.level || '')}
+                  onChange={(e) => setDraft({ ...draft, level: e.target.value })}
+                />
               </label>
-              <label className="text-xs text-[#A6B2C9]">
+              <label className="text-xs text-[var(--text-secondary)]">
                 Curriculum Title *
-                <input required className={INPUT_CLASS} value={String(draft.title || '')} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.title || '')}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                />
               </label>
-              <label className="sm:col-span-2 text-xs text-[#A6B2C9]">
+              <label className="sm:col-span-2 text-xs text-[var(--text-secondary)]">
                 Focus Description
-                <textarea rows={2} className={INPUT_CLASS} value={String(draft.focus || '')} onChange={(e) => setDraft({ ...draft, focus: e.target.value })} />
+                <textarea
+                  rows={2}
+                  className={INPUT_CLASS}
+                  value={String(draft.focus || '')}
+                  onChange={(e) => setDraft({ ...draft, focus: e.target.value })}
+                />
               </label>
-              <label className="sm:col-span-2 text-xs text-[#A6B2C9]">
+              <label className="sm:col-span-2 text-xs text-[var(--text-secondary)]">
                 Topics (comma-separated)
                 <input
                   className={INPUT_CLASS}
-                  value={Array.isArray(draft.topics) ? draft.topics.join(', ') : String(draft.topics || '')}
+                  value={
+                    Array.isArray(draft.topics)
+                      ? draft.topics.join(', ')
+                      : String(draft.topics || '')
+                  }
                   onChange={(e) => setDraft({ ...draft, topics: e.target.value })}
                 />
               </label>
             </div>
           )}
 
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#00D9FF] px-4 py-2 text-xs font-semibold text-[#070B18] cursor-pointer"
-            >
+          {section === 'learning' && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="text-xs text-[var(--text-secondary)]">
+                Title *
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.title || '')}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                />
+              </label>
+              <label className="text-xs text-[var(--text-secondary)]">
+                Category *
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  placeholder="Mathematics, Machine Learning, Web Systems..."
+                  value={String(draft.category || '')}
+                  onChange={(e) => setDraft({ ...draft, category: e.target.value })}
+                />
+              </label>
+              <label className="text-xs text-[var(--text-secondary)]">
+                Index Label
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.indexLabel || '')}
+                  onChange={(e) => setDraft({ ...draft, indexLabel: e.target.value })}
+                />
+              </label>
+              <label className="text-xs text-[var(--text-secondary)]">
+                Status
+                <input
+                  className={INPUT_CLASS}
+                  placeholder="Active Study / Ongoing Research"
+                  value={String(draft.status || '')}
+                  onChange={(e) => setDraft({ ...draft, status: e.target.value })}
+                />
+              </label>
+              <label className="sm:col-span-2 text-xs text-[var(--text-secondary)]">
+                Focus Description
+                <textarea
+                  rows={2}
+                  className={INPUT_CLASS}
+                  value={String(draft.focus || '')}
+                  onChange={(e) => setDraft({ ...draft, focus: e.target.value })}
+                />
+              </label>
+              <label className="sm:col-span-2 text-xs text-[var(--text-secondary)]">
+                Topics &amp; Key Concepts (comma-separated)
+                <input
+                  className={INPUT_CLASS}
+                  value={
+                    Array.isArray(draft.resources)
+                      ? draft.resources.join(', ')
+                      : String(draft.resources || '')
+                  }
+                  onChange={(e) => setDraft({ ...draft, resources: e.target.value })}
+                />
+              </label>
+            </div>
+          )}
+
+          {section === 'journey' && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="text-xs text-[var(--text-secondary)]">
+                Milestone Title *
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  value={String(draft.title || '')}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                />
+              </label>
+              <label className="text-xs text-[var(--text-secondary)]">
+                Period *
+                <input
+                  required
+                  className={INPUT_CLASS}
+                  placeholder="e.g. Oct 2023 — Present"
+                  value={String(draft.period || '')}
+                  onChange={(e) => setDraft({ ...draft, period: e.target.value })}
+                />
+              </label>
+              <label className="text-xs text-[var(--text-secondary)]">
+                Phase
+                <input
+                  className={INPUT_CLASS}
+                  placeholder="University, Community Leadership, Teaching..."
+                  value={String(draft.phase || '')}
+                  onChange={(e) => setDraft({ ...draft, phase: e.target.value })}
+                />
+              </label>
+              <label className="text-xs text-[var(--text-secondary)]">
+                Organization
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.organization || '')}
+                  onChange={(e) => setDraft({ ...draft, organization: e.target.value })}
+                />
+              </label>
+              <label className="text-xs text-[var(--text-secondary)]">
+                Location
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.location || '')}
+                  onChange={(e) => setDraft({ ...draft, location: e.target.value })}
+                />
+              </label>
+              <label className="text-xs text-[var(--text-secondary)]">
+                Index Label
+                <input
+                  className={INPUT_CLASS}
+                  value={String(draft.indexLabel || '')}
+                  onChange={(e) => setDraft({ ...draft, indexLabel: e.target.value })}
+                />
+              </label>
+              <label className="sm:col-span-2 text-xs text-[var(--text-secondary)]">
+                Summary
+                <textarea
+                  rows={2}
+                  className={INPUT_CLASS}
+                  value={String(draft.summary || '')}
+                  onChange={(e) => setDraft({ ...draft, summary: e.target.value })}
+                />
+              </label>
+              <label className="sm:col-span-2 text-xs text-[var(--text-secondary)]">
+                Tags (comma-separated)
+                <input
+                  className={INPUT_CLASS}
+                  value={
+                    Array.isArray(draft.tags) ? draft.tags.join(', ') : String(draft.tags || '')
+                  }
+                  onChange={(e) => setDraft({ ...draft, tags: e.target.value })}
+                />
+              </label>
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+            <label className="flex items-center gap-2 text-xs text-[var(--text-primary)] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={draft.published !== false}
+                onChange={(e) => setDraft({ ...draft, published: e.target.checked })}
+                className="accent-[var(--accent-primary)]"
+              />
+              <span>Published on public site</span>
+            </label>
+            <button type="submit" className={PRIMARY_BTN_CLASS}>
               <Save className="h-3.5 w-3.5" />
               <span>Save Entry</span>
             </button>
@@ -963,43 +1322,45 @@ export function AcademicPanels({
       <div className="space-y-3">
         {items.map((item) => {
           const heading =
-            'title' in item
-              ? item.title
-              : 'degree' in item
-                ? item.degree
-                : 'Entry';
+            'title' in item ? item.title : 'degree' in item ? item.degree : 'Entry';
           const sub =
-            'domain' in item
-              ? item.domain
-              : 'institution' in item
-                ? `${item.institution} · ${item.period}`
-                : 'organization' in item
-                  ? `${item.organization} · ${item.period}`
-                  : 'level' in item
-                    ? item.level
-                    : '';
+            section === 'learning' && 'category' in item && 'status' in item
+              ? `${item.category} · ${item.status}`
+              : section === 'journey' && 'phase' in item && 'period' in item
+                ? `${item.phase} · ${item.period}`
+                : 'domain' in item
+                  ? item.domain
+                  : 'institution' in item
+                    ? `${item.institution} · ${item.period}`
+                    : 'organization' in item
+                      ? `${item.organization} · ${item.period}`
+                      : 'level' in item
+                        ? item.level
+                        : '';
 
           return (
             <div
               key={item.id}
-              className="flex items-center justify-between gap-4 rounded-xl border border-[#F4F7FF]/10 bg-[#10182B] px-5 py-4"
+              className="flex items-center justify-between gap-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-5 py-4"
             >
               <div className="min-w-0">
-                <p className="font-mono text-xs text-[#00D9FF]">{sub}</p>
-                <h3 className="mt-0.5 truncate text-base font-semibold text-[#F4F7FF]">{heading}</h3>
+                <p className="font-mono text-xs text-[var(--accent-ink)]">{sub}</p>
+                <h3 className="mt-0.5 truncate text-base font-semibold text-[var(--text-primary)]">
+                  {heading}
+                </h3>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={() => setDraft({ ...item })}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#F4F7FF]/12 text-[#A6B2C9] hover:border-[#00D9FF]/45 hover:text-[#00D9FF] cursor-pointer"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-[var(--accent-ink)] cursor-pointer"
                 >
                   <Pencil className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
                   onClick={() => deleteItem(item.id)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#F4F7FF]/12 text-[#A6B2C9] hover:border-rose-400/50 hover:text-rose-400 cursor-pointer"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-rose-400/50 hover:text-rose-500 cursor-pointer"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

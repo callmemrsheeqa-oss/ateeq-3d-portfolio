@@ -15,8 +15,25 @@
     />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#070B18" />
+    <meta name="theme-color" content="#0A0A0A" />
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('ateeq-theme');
+          var pref = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+          var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var resolved = pref === 'system' ? (systemDark ? 'dark' : 'light') : pref;
+          var root = document.documentElement;
+          root.classList.remove('light', 'dark');
+          root.classList.add(resolved);
+          root.dataset.themePref = pref;
+          root.style.colorScheme = resolved;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', resolved === 'dark' ? '#0A0A0A' : '#F7FAFC');
+        } catch (e) {}
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,7 +41,7 @@
       rel="stylesheet"
     />
   </head>
-  <body class="bg-[#070B18] text-[#F4F7FF] antialiased selection:bg-[#00D9FF]/25 selection:text-[#F4F7FF]">
+  <body class="antialiased selection:bg-[#007BA7]/25">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

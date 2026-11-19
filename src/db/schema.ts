@@ -246,6 +246,36 @@ export const aiKnowledge = pgTable('ai_knowledge', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
+export const learningItems = pgTable('learning_items', {
+  id: serial('id').primaryKey(),
+  indexLabel: text('index_label').notNull(),
+  category: text('category').notNull(),
+  title: text('title').notNull(),
+  focus: text('focus').notNull(),
+  resources: jsonb('resources').$type<string[]>().notNull(),
+  status: text('status').notNull().default('Active Study'),
+  published: boolean('published').notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const journeyMilestones = pgTable('journey_milestones', {
+  id: serial('id').primaryKey(),
+  indexLabel: text('index_label').notNull(),
+  period: text('period').notNull(),
+  phase: text('phase').notNull(),
+  title: text('title').notNull(),
+  organization: text('organization').notNull(),
+  location: text('location').notNull().default(''),
+  summary: text('summary').notNull(),
+  tags: jsonb('tags').$type<string[]>().notNull(),
+  published: boolean('published').notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
 export const siteSettings = pgTable('site_settings', {
   id: serial('id').primaryKey(),
   siteTitle: text('site_title').notNull(),
@@ -253,6 +283,10 @@ export const siteSettings = pgTable('site_settings', {
   muavinEnabled: boolean('muavin_enabled').notNull().default(true),
   muavinWelcomeMessage: text('muavin_welcome_message').notNull(),
   muavinSystemTone: text('muavin_system_tone').notNull(),
+  muavinSuggestedQuestions: jsonb('muavin_suggested_questions')
+    .$type<string[]>()
+    .default([])
+    .notNull(),
   teachingHeadline: text('teaching_headline').notNull(),
   teachingSummary: text('teaching_summary').notNull(),
   teachingAudience: text('teaching_audience').notNull(),

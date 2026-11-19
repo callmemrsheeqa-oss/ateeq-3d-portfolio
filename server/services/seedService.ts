@@ -5,6 +5,8 @@ import {
   aiKnowledge,
   educations,
   experiences,
+  journeyMilestones,
+  learningItems,
   profiles,
   projects,
   siteSettings,
@@ -13,6 +15,9 @@ import {
   teachings,
 } from '../../src/db/schema.ts';
 import {
+  DEFAULT_JOURNEY_MILESTONES,
+  DEFAULT_LEARNING_ITEMS,
+  DEFAULT_MUAVIN_SUGGESTIONS,
   EXPERIENCE_TIMELINE,
   PROFILE,
   SKILL_GROUPS,
@@ -51,9 +56,9 @@ async function runIdempotentSeed(): Promise<void> {
       });
     }
 
-    // 2. Ensure SiteSettings row exists
-    const [{ value: settingsCount }] = await db.select({ value: count() }).from(siteSettings);
-    if (settingsCount === 0) {
+    // 2. Ensure SiteSettings row exists & backfill default suggested questions if empty
+    const settingsRows = await db.select().from(siteSettings).limit(1);
+    if (settingsRows.length === 0) {
       await db.insert(siteSettings).values({
         siteTitle: 'Ateeq Ur Rehman — Mathematics, AI & Creative Technology',
         siteTagline: 'A Mathematical Mind in a Futuristic Digital Universe',
@@ -62,6 +67,7 @@ async function runIdempotentSeed(): Promise<void> {
           'Hello! I am Muavin AI, Ateeq Ur Rehman’s portfolio assistant. Ask me about his BS Mathematics studies at CASPAM (BZU), projects, teaching experience, skills, or contact details.',
         muavinSystemTone:
           'Concise, accurate, respectful, mathematically literate, and strictly grounded in Ateeq Ur Rehman’s published portfolio database.',
+        muavinSuggestedQuestions: DEFAULT_MUAVIN_SUGGESTIONS,
         teachingHeadline: TEACHING_PROFILE.headline,
         teachingSummary: TEACHING_PROFILE.summary,
         teachingAudience: TEACHING_PROFILE.audienceRange,
@@ -69,6 +75,14 @@ async function runIdempotentSeed(): Promise<void> {
         teachingMode: TEACHING_PROFILE.mode,
         teachingLocation: TEACHING_PROFILE.location,
       });
+    } else if (
+      !Array.isArray(settingsRows[0].muavinSuggestedQuestions) ||
+      settingsRows[0].muavinSuggestedQuestions.length === 0
+    ) {
+      await db
+        .update(siteSettings)
+        .set({ muavinSuggestedQuestions: DEFAULT_MUAVIN_SUGGESTIONS, updatedAt: new Date() })
+        .where(eq(siteSettings.id, settingsRows[0].id));
     }
 
     // 3. Migrate verified Educations if empty
@@ -198,6 +212,42 @@ async function runIdempotentSeed(): Promise<void> {
           href: s.href,
           description: s.description,
           external: s.external,
+          published: true,
+          sortOrder: idx + 1,
+        })),
+      );
+    }
+
+    // 8b. Seed verified Learning Items if empty
+    const [{ value: learningCount }] = await db.select({ value: count() }).from(learningItems);
+    if (learningCount === 0) {
+      await db.insert(learningItems).values(
+        DEFAULT_LEARNING_ITEMS.map((item, idx) => ({
+          indexLabel: item.index,
+          category: item.category,
+          title: item.title,
+          focus: item.focus,
+          resources: item.resources,
+          status: item.status,
+          published: true,
+          sortOrder: idx + 1,
+        })),
+      );
+    }
+
+    // 8c. Seed verified Journey Milestones if empty
+    const [{ value: journeyCount }] = await db.select({ value: count() }).from(journeyMilestones);
+    if (journeyCount === 0) {
+      await db.insert(journeyMilestones).values(
+        DEFAULT_JOURNEY_MILESTONES.map((m, idx) => ({
+          indexLabel: m.index,
+          period: m.period,
+          phase: m.phase,
+          title: m.title,
+          organization: m.organization,
+          location: m.location,
+          summary: m.summary,
+          tags: m.tags,
           published: true,
           sortOrder: idx + 1,
         })),

@@ -135,11 +135,11 @@ export function Contact() {
 
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 lg:px-8 lg:pt-16">
         <header>
-          <p className="font-mono text-xs tracking-wider text-[#00D9FF]">CONTACT</p>
-          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#F4F7FF] sm:text-5xl">
+          <p className="font-mono text-xs tracking-wider text-[var(--accent-ink)]">CONTACT</p>
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl">
             Let’s connect.
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#A6B2C9]">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
             Open to conversations about mathematics, machine learning projects, web development,
             student collaborations, or Class 1–12 mathematics tuition.
           </p>
@@ -149,8 +149,8 @@ export function Contact() {
           {/* Contact Channels */}
           <div className="space-y-4 lg:col-span-5">
             <div className="glass-panel rounded-2xl p-6">
-              <p className="font-mono text-xs text-[#00D9FF]">DIRECT CHANNELS</p>
-              <h2 className="mt-2 text-xl font-semibold text-[#F4F7FF]">
+              <p className="font-mono text-xs text-[var(--accent-ink)]">DIRECT CHANNELS</p>
+              <h2 className="mt-2 text-xl font-semibold text-[var(--text-primary)]">
                 Reach out where it suits you.
               </h2>
 
@@ -161,10 +161,10 @@ export function Contact() {
                       href={channel.href}
                       target={channel.external ? '_blank' : undefined}
                       rel={channel.external ? 'noopener noreferrer' : undefined}
-                      className="flex items-center justify-between gap-4 rounded-xl border border-[#F4F7FF]/10 bg-[#070B18]/65 px-4 py-3.5 hover:border-[#00D9FF]/40 transition-colors"
+                      className="flex items-center justify-between gap-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-3.5 hover:border-[var(--border-accent)] hover:bg-[var(--bg-surface-hover)] transition-colors"
                     >
                       <div className="flex min-w-0 items-center gap-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#10182B] text-[#00D9FF]">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-base)] text-[var(--accent-ink)]">
                           {channel.platformKey === 'email' && (
                             <Mail className="h-4 w-4" aria-hidden="true" />
                           )}
@@ -185,11 +185,18 @@ export function Contact() {
                           ) && <Globe className="h-4 w-4" aria-hidden="true" />}
                         </span>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-[#F4F7FF]">{channel.label}</p>
-                          <p className="truncate text-xs text-[#A6B2C9]">{channel.handle}</p>
+                          <p className="text-sm font-medium text-[var(--text-primary)]">
+                            {channel.label}
+                          </p>
+                          <p className="truncate text-xs text-[var(--text-secondary)]">
+                            {channel.handle}
+                          </p>
                         </div>
                       </div>
-                      <ArrowUpRight className="h-4 w-4 shrink-0 text-[#A6B2C9]" aria-hidden="true" />
+                      <ArrowUpRight
+                        className="h-4 w-4 shrink-0 text-[var(--text-secondary)]"
+                        aria-hidden="true"
+                      />
                     </a>
                   </li>
                 ))}
@@ -202,13 +209,15 @@ export function Contact() {
             <div className="glass-panel rounded-2xl p-6 sm:p-8">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="font-mono text-xs text-[#8957FF]">SEND A MESSAGE</p>
-                  <h2 className="mt-1 text-2xl font-semibold text-[#F4F7FF]">
+                  <p className="font-mono text-xs text-[var(--accent-secondary-ink)]">
+                    SEND A MESSAGE
+                  </p>
+                  <h2 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
                     Direct Enquiry Form
                   </h2>
                 </div>
                 {smtpConfigured === false && (
-                  <p className="font-mono text-xs text-[#A6B2C9]">
+                  <p className="font-mono text-xs text-[var(--text-secondary)]">
                     Inbox persistence active · Direct mail fallback ready
                   </p>
                 )}
@@ -232,7 +241,7 @@ export function Contact() {
                   <div>
                     <label
                       htmlFor="contact-name"
-                      className="block text-xs font-medium text-[#F4F7FF]"
+                      className="block text-xs font-medium text-[var(--text-primary)]"
                     >
                       Your Name
                     </label>
@@ -246,17 +255,19 @@ export function Contact() {
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
                       placeholder="e.g. Ayesha Khan"
-                      className="mt-2 w-full rounded-lg border border-[#F4F7FF]/15 bg-[#070B18]/85 px-3.5 py-2.5 text-sm text-[#F4F7FF] placeholder-[#A6B2C9]/50 focus:border-[#00D9FF] focus:outline-none"
+                      className="mt-2 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/55 focus:border-[var(--accent-ink)] focus:outline-none"
                     />
                     {status.state === 'error' && status.fields?.name && (
-                      <p className="mt-1.5 text-xs text-rose-400">{status.fields.name}</p>
+                      <p className="mt-1.5 text-xs text-rose-600 dark:text-rose-400">
+                        {status.fields.name}
+                      </p>
                     )}
                   </div>
 
                   <div>
                     <label
                       htmlFor="contact-email"
-                      className="block text-xs font-medium text-[#F4F7FF]"
+                      className="block text-xs font-medium text-[var(--text-primary)]"
                     >
                       Email Address
                     </label>
@@ -269,10 +280,12 @@ export function Contact() {
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
                       placeholder="you@example.com"
-                      className="mt-2 w-full rounded-lg border border-[#F4F7FF]/15 bg-[#070B18]/85 px-3.5 py-2.5 text-sm text-[#F4F7FF] placeholder-[#A6B2C9]/50 focus:border-[#00D9FF] focus:outline-none"
+                      className="mt-2 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/55 focus:border-[var(--accent-ink)] focus:outline-none"
                     />
                     {status.state === 'error' && status.fields?.email && (
-                      <p className="mt-1.5 text-xs text-rose-400">{status.fields.email}</p>
+                      <p className="mt-1.5 text-xs text-rose-600 dark:text-rose-400">
+                        {status.fields.email}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -280,7 +293,7 @@ export function Contact() {
                 <div>
                   <label
                     htmlFor="contact-subject"
-                    className="block text-xs font-medium text-[#F4F7FF]"
+                    className="block text-xs font-medium text-[var(--text-primary)]"
                   >
                     Subject
                   </label>
@@ -294,17 +307,19 @@ export function Contact() {
                     value={form.subject}
                     onChange={(e) => setForm({ ...form, subject: e.target.value })}
                     placeholder="Collaboration, project question, or mathematics tuition"
-                    className="mt-2 w-full rounded-lg border border-[#F4F7FF]/15 bg-[#070B18]/85 px-3.5 py-2.5 text-sm text-[#F4F7FF] placeholder-[#A6B2C9]/50 focus:border-[#00D9FF] focus:outline-none"
+                    className="mt-2 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/55 focus:border-[var(--accent-ink)] focus:outline-none"
                   />
                   {status.state === 'error' && status.fields?.subject && (
-                    <p className="mt-1.5 text-xs text-rose-400">{status.fields.subject}</p>
+                    <p className="mt-1.5 text-xs text-rose-600 dark:text-rose-400">
+                      {status.fields.subject}
+                    </p>
                   )}
                 </div>
 
                 <div>
                   <label
                     htmlFor="contact-message"
-                    className="block text-xs font-medium text-[#F4F7FF]"
+                    className="block text-xs font-medium text-[var(--text-primary)]"
                   >
                     Message
                   </label>
@@ -318,10 +333,12 @@ export function Contact() {
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     placeholder="Share a brief overview of what you have in mind..."
-                    className="mt-2 w-full rounded-lg border border-[#F4F7FF]/15 bg-[#070B18]/85 px-3.5 py-2.5 text-sm text-[#F4F7FF] placeholder-[#A6B2C9]/50 focus:border-[#00D9FF] focus:outline-none"
+                    className="mt-2 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/55 focus:border-[var(--accent-ink)] focus:outline-none"
                   />
                   {status.state === 'error' && status.fields?.message && (
-                    <p className="mt-1.5 text-xs text-rose-400">{status.fields.message}</p>
+                    <p className="mt-1.5 text-xs text-rose-600 dark:text-rose-400">
+                      {status.fields.message}
+                    </p>
                   )}
                 </div>
 
@@ -331,14 +348,16 @@ export function Contact() {
                     <div
                       className={`space-y-3 rounded-xl border p-4 text-sm ${
                         status.emailDelivered
-                          ? 'border-emerald-400/35 bg-emerald-500/10 text-emerald-200'
-                          : 'border-[#00D9FF]/35 bg-[#00D9FF]/10 text-[#F4F7FF]'
+                          ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200'
+                          : 'border-[var(--border-accent)] bg-[var(--bg-surface-hover)] text-[var(--text-primary)]'
                       }`}
                     >
                       <div className="flex items-start gap-3">
                         <CheckCircle2
                           className={`mt-0.5 h-4 w-4 shrink-0 ${
-                            status.emailDelivered ? 'text-emerald-400' : 'text-[#00D9FF]'
+                            status.emailDelivered
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : 'text-[var(--accent-ink)]'
                           }`}
                           aria-hidden="true"
                         />
@@ -347,7 +366,7 @@ export function Contact() {
                       {!status.emailDelivered && (
                         <a
                           href={status.mailtoDraft}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-[#F4F7FF]/20 bg-[#10182B] px-3.5 py-2 text-xs font-medium text-[#00D9FF] hover:border-[#00D9FF]"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3.5 py-2 text-xs font-medium text-[var(--accent-ink)] hover:border-[var(--border-accent)]"
                         >
                           <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                           <span>Also Send via Email App</span>
@@ -357,17 +376,17 @@ export function Contact() {
                   )}
 
                   {status.state === 'error' && (
-                    <div className="space-y-3 rounded-xl border border-rose-400/35 bg-rose-500/10 p-4 text-sm text-rose-200">
+                    <div className="space-y-3 rounded-xl border border-rose-500/35 bg-rose-500/10 p-4 text-sm text-rose-800 dark:text-rose-200">
                       <div className="flex items-start gap-3">
                         <AlertCircle
-                          className="mt-0.5 h-4 w-4 shrink-0 text-rose-400"
+                          className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400"
                           aria-hidden="true"
                         />
                         <span>{status.message}</span>
                       </div>
                       <a
                         href={mailtoHref}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#F4F7FF]/20 bg-[#10182B] px-3.5 py-2 text-xs font-medium text-[#00D9FF] hover:border-[#00D9FF]"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3.5 py-2 text-xs font-medium text-[var(--accent-ink)] hover:border-[var(--border-accent)]"
                       >
                         <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>Open Pre-filled Email Draft</span>
@@ -380,7 +399,7 @@ export function Contact() {
                   <button
                     type="submit"
                     disabled={status.state === 'loading'}
-                    className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-[#00D9FF] px-6 py-2.5 text-sm font-semibold text-[#070B18] hover:bg-[#3CE4FF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap shrink-0"
+                    className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-[var(--accent-primary)] px-6 py-2.5 text-sm font-semibold text-[var(--accent-on-primary)] hover:bg-[var(--accent-primary-hover)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap shrink-0 shadow-[0_8px_22px_var(--glow-primary)]"
                   >
                     {status.state === 'loading' ? (
                       <>
@@ -397,7 +416,7 @@ export function Contact() {
 
                   <a
                     href={mailtoHref}
-                    className="text-xs font-medium text-[#A6B2C9] hover:text-[#00D9FF] transition-colors"
+                    className="text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--accent-ink)] transition-colors"
                   >
                     Or compose in your email app ↗
                   </a>

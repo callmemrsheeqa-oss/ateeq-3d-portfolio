@@ -247,3 +247,111 @@ export const SKILL_GROUPS: SkillGroup[] = [
     contextLabel: 'Practised Through Experience',
   },
 ];
+
+export const DEFAULT_LEARNING_ITEMS = [
+  {
+    index: '01',
+    category: 'Mathematics',
+    title: 'Abstract Algebra, Rings & Field Structures',
+    focus:
+      'Deepening undergraduate studies at CASPAM (BZU) across group actions, homomorphisms, ring ideals, and structural proofs.',
+    resources: ['Group Actions', 'Quotient Structures', 'Linear Operators', 'Proof Writing'],
+    status: '7th Semester Study',
+  },
+  {
+    index: '02',
+    category: 'AI & ML',
+    title: 'Retrieval-Augmented Generation & Vector Search',
+    focus:
+      'Exploring semantic embeddings, inner-product cosine similarity, and grounded retrieval pipelines connecting linear algebra to practical AI systems.',
+    resources: ['Cosine Similarity', 'Document Chunking', 'Grounded Retrieval', 'Evaluation Logic'],
+    status: 'Active Exploration',
+  },
+  {
+    index: '03',
+    category: 'Computation',
+    title: 'Symbolic & Numerical Python Computing',
+    focus:
+      'Expanding mathematical computation workflows in Python using SymPy for symbolic derivations, NumPy for matrix modeling, and Matplotlib for visualization.',
+    resources: ['SymPy Symbolic Algebra', 'NumPy Arrays', 'Matplotlib Plotting', 'Scikit-Learn Basics'],
+    status: 'Continuous Practice',
+  },
+  {
+    index: '04',
+    category: 'Systems & Web',
+    title: 'Interactive 3D Web & Full-Stack TypeScript',
+    focus:
+      'Refining real-time Three.js / React Three Fiber geometry rendering, accessible UI systems, and structured PostgreSQL data modeling.',
+    resources: ['Three.js & R3F', 'TypeScript Architecture', 'PostgreSQL & Drizzle', 'REST APIs'],
+    status: 'Building in Public',
+  },
+];
+
+export const DEFAULT_JOURNEY_MILESTONES = [
+  {
+    index: '01',
+    period: '2023 – 2027',
+    phase: 'Academic Degree',
+    title: 'BS Mathematics (Currently 7th Semester)',
+    organization: 'CASPAM, Bahauddin Zakariya University (BZU)',
+    location: 'Multan, Pakistan',
+    summary:
+      'Pursuing undergraduate mathematics with strong emphasis on pure mathematical structure, quantitative reasoning, and analytical problem solving.',
+    tags: ['Pure Mathematics', 'Abstract Algebra', 'Analysis'],
+  },
+  {
+    index: '02',
+    period: 'Approx. 2 Years',
+    phase: 'Teaching Practice',
+    title: 'Mathematics Tutor (Classes 1 – 12)',
+    organization: 'Independent Tuition & Mentorship',
+    location: 'Multan, Pakistan',
+    summary:
+      'Guiding school and higher-secondary learners step by step through core concepts so formulas make intuitive sense before memorization.',
+    tags: ['Concept Clarity', 'Adaptive Instruction', 'Problem Solving'],
+  },
+  {
+    index: '03',
+    period: 'University Term',
+    phase: 'Student Society',
+    title: 'Executive Member',
+    organization: 'Zakarian Debating Society (ZDS)',
+    location: 'BZU, Multan',
+    summary:
+      'Practiced structured argumentation, clear articulation, and collaborative event coordination in university debating circles.',
+    tags: ['Rhetoric', 'Teamwork', 'Public Speaking'],
+  },
+  {
+    index: '04',
+    period: 'Arranged via BZU CDC',
+    phase: 'Industry Exposure',
+    title: 'Banking Intern',
+    organization: 'MCB Bank (Chungi No. 6 Branch)',
+    location: 'Multan, Pakistan',
+    summary:
+      'Completed an internship arranged through the BZU Career Development Center, gaining firsthand exposure to branch operations and client service workflows.',
+    tags: ['Operational Workflows', 'Client Service', 'Professional Discipline'],
+  },
+  {
+    index: '05',
+    period: 'October 2026 – June 2027',
+    phase: 'Community Leadership',
+    title: 'Vice President',
+    organization: 'Zakariyan Google Developer Club (ZGDC)',
+    location: 'BZU, Multan',
+    summary:
+      'Serving as Vice President to support peer technical learning, collaborative workshops, and campus software initiatives.',
+    tags: ['Developer Community', 'Leadership', 'Peer Learning'],
+  },
+];
+
+export const DEFAULT_MUAVIN_SUGGESTIONS = [
+  'Who is Ateeq Ur Rehman?',
+  'What are his technical skills?',
+  'Tell me about his projects.',
+  'What is his educational background?',
+  'What does he teach?',
+  'How can I contact him?',
+  'What is Muavin AI?',
+];
+

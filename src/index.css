@@ -1,22 +1,56 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
 
-  --color-void: #070B18;
-  --color-surface: #10182B;
-  --color-cyan-accent: #00D9FF;
-  --color-violet-accent: #8957FF;
-  --color-ink: #F4F7FF;
-  --color-ink-muted: #A6B2C9;
+:root {
+  --bg-base: #F7FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-hover: #F1F6FB;
+  --bg-elevated: rgba(255, 255, 255, 0.88);
+  --bg-elevated-hover: rgba(255, 255, 255, 0.98);
+  --border-subtle: #DCE5EF;
+  --border-accent: rgba(23, 59, 99, 0.34);
+  --text-primary: #14253D;
+  --text-secondary: #536579;
+  --accent-primary: #173B63;
+  --accent-primary-hover: #214F82;
+  --accent-ink: #173B63;
+  --accent-on-primary: #FFFFFF;
+  --accent-secondary: #D81B78;
+  --accent-secondary-ink: #D81B78;
+  --panel-shadow: 0 14px 36px rgba(20, 37, 61, 0.08);
+  --glow-primary: rgba(23, 59, 99, 0.16);
+}
+
+.dark {
+  --bg-base: #0A0A0A;
+  --bg-surface: #15161B;
+  --bg-surface-hover: #1C1E26;
+  --bg-elevated: rgba(21, 22, 27, 0.82);
+  --bg-elevated-hover: rgba(21, 22, 27, 0.96);
+  --border-subtle: rgba(248, 250, 252, 0.11);
+  --border-accent: rgba(0, 123, 167, 0.45);
+  --text-primary: #F8FAFC;
+  --text-secondary: #A7B0BE;
+  --accent-primary: #007BA7;
+  --accent-primary-hover: #0B92C2;
+  --accent-ink: #38B6E6;
+  --accent-on-primary: #F8FAFC;
+  --accent-secondary: #FF2D95;
+  --accent-secondary-ink: #FF5CAD;
+  --panel-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+  --glow-primary: rgba(0, 123, 167, 0.24);
 }
 
 @layer base {
   html {
-    background-color: #070B18;
-    color: #F4F7FF;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
     font-family: var(--font-sans);
     scroll-behavior: smooth;
   }
@@ -30,9 +64,10 @@
   body {
     min-height: 100vh;
     overflow-x: hidden;
-    background-color: #070B18;
-    color: #F4F7FF;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
     letter-spacing: 0.008em;
+    transition: background-color 220ms ease, color 220ms ease;
   }
 
   h1, h2, h3, h4 {
@@ -41,15 +76,15 @@
   }
 
   :focus-visible {
-    outline: 2px solid #00D9FF;
+    outline: 2px solid var(--accent-ink);
     outline-offset: 3px;
   }
 }
 
 .glass-panel {
-  background: rgba(16, 24, 43, 0.72);
-  border: 1px solid rgba(244, 247, 255, 0.09);
-  box-shadow: 0 18px 48px rgba(3, 6, 18, 0.45);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--panel-shadow);
 }
 
 .glass-panel-hover {
@@ -59,22 +94,27 @@
 }
 
 .glass-panel-hover:hover {
-  border-color: rgba(0, 217, 255, 0.32);
-  background: rgba(16, 24, 43, 0.86);
+  border-color: var(--border-accent);
+  background: var(--bg-elevated-hover);
 }
 
 .hairline-divider {
   height: 1px;
   background: linear-gradient(
     90deg,
-    rgba(244, 247, 255, 0) 0%,
-    rgba(244, 247, 255, 0.14) 50%,
-    rgba(244, 247, 255, 0) 100%
+    transparent 0%,
+    var(--border-subtle) 50%,
+    transparent 100%
   );
 }
 
 .text-gradient-accent {
-  background: linear-gradient(125deg, #F4F7FF 15%, #00D9FF 62%, #8957FF 100%);
+  background: linear-gradient(
+    125deg,
+    var(--text-primary) 10%,
+    var(--accent-ink) 56%,
+    var(--accent-secondary-ink) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

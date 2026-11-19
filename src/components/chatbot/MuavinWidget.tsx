@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Loader2, MessageSquare, RotateCcw, Send, Sparkles, X } from 'lucide-react';
 import { usePortfolio } from '../../context/PortfolioContext';
+import { DEFAULT_MUAVIN_SUGGESTIONS } from '../../data/profile';
 import { useDeviceCapabilities } from '../../hooks/useDeviceCapabilities';
 
 interface ChatMessage {
@@ -9,13 +10,6 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
 }
-
-const SUGGESTED_QUESTIONS = [
-  "What is Ateeq's educational background?",
-  'Tell me about his Finite Group Theory and AI projects.',
-  'What is his mathematics teaching experience?',
-  'How can I contact Ateeq or download his CV?',
-];
 
 export function MuavinWidget() {
   const { portfolio } = usePortfolio();
@@ -36,6 +30,11 @@ export function MuavinWidget() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const suggestedQuestions =
+    Array.isArray(settings.muavinSuggestedQuestions) && settings.muavinSuggestedQuestions.length > 0
+      ? settings.muavinSuggestedQuestions
+      : DEFAULT_MUAVIN_SUGGESTIONS;
 
   useEffect(() => {
     setMessages((prev) => {
@@ -146,8 +145,6 @@ export function MuavinWidget() {
     ]);
   };
 
-  const showSuggestions = messages.length <= 1 && !sending;
-
   return (
     <div className="no-print fixed bottom-5 right-5 z-40 flex flex-col items-end">
       <AnimatePresence>
@@ -159,19 +156,19 @@ export function MuavinWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.97 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-3 flex h-[min(540px,calc(100vh-6.5rem))] w-[min(390px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-[#00D9FF]/30 bg-[#070B18] shadow-[0_24px_64px_rgba(0,0,0,0.65)]"
+            className="mb-3 flex h-[min(570px,calc(100vh-6rem))] w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-[var(--border-accent)] bg-[var(--bg-base)] shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between gap-3 border-b border-[#F4F7FF]/12 bg-[#10182B] px-4 py-3">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-3">
               <div className="flex items-center gap-2.5 min-w-0">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#00D9FF]/15 text-[#00D9FF] border border-[#00D9FF]/30">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--border-accent)] bg-[var(--accent-primary)]/15 text-[var(--accent-ink)]">
                   <Sparkles className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
-                  <h2 className="truncate font-display text-sm font-semibold text-[#F4F7FF]">
+                  <h2 className="truncate font-display text-sm font-semibold text-[var(--text-primary)]">
                     Muavin AI
                   </h2>
-                  <p className="truncate font-mono text-[10px] text-[#A6B2C9]">
+                  <p className="truncate font-mono text-[10px] text-[var(--text-secondary)]">
                     Portfolio Assistant · English
                   </p>
                 </div>
@@ -183,7 +180,7 @@ export function MuavinWidget() {
                   onClick={handleClear}
                   title="Clear conversation"
                   aria-label="Clear chat"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#F4F7FF]/12 text-[#A6B2C9] hover:border-[#00D9FF]/40 hover:text-[#F4F7FF] transition-colors cursor-pointer"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                 >
                   <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
@@ -191,7 +188,7 @@ export function MuavinWidget() {
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Minimize Muavin AI"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#F4F7FF]/12 text-[#A6B2C9] hover:border-[#00D9FF]/40 hover:text-[#F4F7FF] transition-colors cursor-pointer"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                 >
                   <X className="h-4 w-4" aria-hidden="true" />
                 </button>
@@ -210,8 +207,8 @@ export function MuavinWidget() {
                     <div
                       className={`max-w-[85%] rounded-xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-wrap ${
                         isUser
-                          ? 'bg-[#00D9FF] text-[#070B18] font-medium'
-                          : 'border border-[#F4F7FF]/12 bg-[#10182B] text-[#F4F7FF]'
+                          ? 'bg-[var(--accent-primary)] text-[var(--accent-on-primary)] font-medium'
+                          : 'border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)]'
                       }`}
                     >
                       {msg.content}
@@ -220,29 +217,9 @@ export function MuavinWidget() {
                 );
               })}
 
-              {showSuggestions && (
-                <div className="space-y-1.5 pt-2">
-                  <p className="font-mono text-[10px] uppercase tracking-wider text-[#A6B2C9]">
-                    Suggested Questions
-                  </p>
-                  <div className="flex flex-col gap-1.5">
-                    {SUGGESTED_QUESTIONS.map((q) => (
-                      <button
-                        key={q}
-                        type="button"
-                        onClick={() => sendMessage(q)}
-                        className="rounded-lg border border-[#F4F7FF]/12 bg-[#10182B]/70 px-3 py-2 text-left text-xs text-[#A6B2C9] hover:border-[#00D9FF]/45 hover:text-[#F4F7FF] transition-colors cursor-pointer"
-                      >
-                        {q}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {sending && (
                 <div className="flex justify-start">
-                  <div className="inline-flex items-center gap-2 rounded-xl border border-[#F4F7FF]/12 bg-[#10182B] px-3.5 py-2.5 text-xs text-[#00D9FF]">
+                  <div className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3.5 py-2.5 text-xs text-[var(--accent-ink)]">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
                     <span>Thinking...</span>
                   </div>
@@ -250,10 +227,33 @@ export function MuavinWidget() {
               )}
 
               {errorMsg && (
-                <div className="rounded-xl border border-rose-400/35 bg-rose-500/10 px-3.5 py-2.5 text-xs text-rose-200">
+                <div className="rounded-xl border border-rose-500/35 bg-rose-500/10 px-3.5 py-2.5 text-xs text-rose-600 dark:text-rose-200">
                   {errorMsg}
                 </div>
               )}
+            </div>
+
+            {/* Persistent Suggested Questions Bar (always visible & scrollable, preserves history) */}
+            <div
+              aria-label="Quick suggested questions"
+              className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]/75 px-3 py-2"
+            >
+              <p className="mb-1.5 font-mono text-[10px] uppercase tracking-wider text-[var(--text-secondary)]">
+                Quick Questions
+              </p>
+              <div className="flex gap-1.5 overflow-x-auto pb-1">
+                {suggestedQuestions.map((q) => (
+                  <button
+                    key={q}
+                    type="button"
+                    disabled={sending}
+                    onClick={() => sendMessage(q)}
+                    className="shrink-0 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-base)] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-[var(--accent-ink)] disabled:opacity-50 transition-colors cursor-pointer whitespace-nowrap"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Composer */}
@@ -262,7 +262,7 @@ export function MuavinWidget() {
                 e.preventDefault();
                 sendMessage();
               }}
-              className="flex items-center gap-2 border-t border-[#F4F7FF]/12 bg-[#10182B] p-3"
+              className="flex items-center gap-2 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3"
             >
               <input
                 ref={inputRef}
@@ -271,13 +271,13 @@ export function MuavinWidget() {
                 onChange={(e) => setInput(e.target.value)}
                 maxLength={800}
                 placeholder="Ask a question about Ateeq’s portfolio..."
-                className="flex-1 rounded-lg border border-[#F4F7FF]/15 bg-[#070B18] px-3 py-2 text-xs text-[#F4F7FF] placeholder-[#A6B2C9]/55 focus:border-[#00D9FF] focus:outline-none"
+                className="flex-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-base)] px-3 py-2 text-xs text-[var(--text-primary)] placeholder-[var(--text-secondary)]/65 focus:border-[var(--accent-ink)] focus:outline-none"
               />
               <button
                 type="submit"
                 disabled={sending || input.trim().length === 0}
                 aria-label="Send message to Muavin AI"
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#00D9FF] text-[#070B18] hover:bg-[#3CE4FF] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-primary)] text-[var(--accent-on-primary)] hover:bg-[var(--accent-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
               >
                 <Send className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -292,9 +292,9 @@ export function MuavinWidget() {
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-label={open ? 'Close Muavin AI assistant' : 'Open Muavin AI assistant'}
-        className="inline-flex items-center gap-2.5 rounded-full border border-[#00D9FF]/45 bg-[#10182B] px-4 py-3 text-sm font-semibold text-[#F4F7FF] shadow-[0_12px_32px_rgba(0,217,255,0.22)] hover:border-[#00D9FF] hover:bg-[#142038] transition-colors cursor-pointer"
+        className="inline-flex items-center gap-2.5 rounded-full border border-[var(--border-accent)] bg-[var(--bg-surface)] px-4 py-3 text-sm font-semibold text-[var(--text-primary)] shadow-[0_12px_32px_var(--glow-primary)] hover:border-[var(--accent-ink)] transition-colors cursor-pointer"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#00D9FF] text-[#070B18]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent-primary)] text-[var(--accent-on-primary)]">
           {open ? (
             <X className="h-3.5 w-3.5" aria-hidden="true" />
           ) : (

@@ -4,11 +4,13 @@ import {
   Award,
   BookOpen,
   Briefcase,
+  Compass,
   Cpu,
   ExternalLink,
   FileText,
   FolderKanban,
   GraduationCap,
+  History,
   Image as ImageIcon,
   Inbox,
   LayoutDashboard,
@@ -19,6 +21,7 @@ import {
   User,
 } from 'lucide-react';
 import { PageMeta } from '../../components/layout/PageMeta';
+import { ThemeToggle } from '../../components/ui/ThemeToggle';
 import { usePortfolio } from '../../context/PortfolioContext';
 import { AdminLogin } from '../components/AdminLogin';
 import {
@@ -41,6 +44,8 @@ type AdminTab =
   | 'skills'
   | 'educations'
   | 'experiences'
+  | 'learning'
+  | 'journey'
   | 'teachings'
   | 'cv'
   | 'gallery'
@@ -56,6 +61,8 @@ interface OverviewResponse {
     educations: number;
     experiences: number;
     teachings: number;
+    learningItems?: number;
+    journeyMilestones?: number;
     awards: number;
     certificates: number;
     gallery: number;
@@ -73,6 +80,8 @@ const TABS: { id: AdminTab; label: string; icon: React.ComponentType<{ className
   { id: 'skills', label: 'Skills', icon: Cpu },
   { id: 'educations', label: 'Education', icon: GraduationCap },
   { id: 'experiences', label: 'Experience', icon: Briefcase },
+  { id: 'learning', label: 'Learning', icon: Compass },
+  { id: 'journey', label: 'Journey', icon: History },
   { id: 'teachings', label: 'Teaching', icon: BookOpen },
   { id: 'cv', label: 'CV PDF', icon: FileText },
   { id: 'gallery', label: 'Gallery & Photo', icon: ImageIcon },
@@ -115,8 +124,8 @@ export function AdminDashboard() {
 
   if (checking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#070B18] text-[#A6B2C9]">
-        <Loader2 className="h-6 w-6 animate-spin text-[#00D9FF]" />
+      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)] text-[var(--text-secondary)]">
+        <Loader2 className="h-6 w-6 animate-spin text-[var(--accent-ink)]" />
       </div>
     );
   }
@@ -136,25 +145,26 @@ export function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070B18] text-[#F4F7FF]">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
       <PageMeta title="Admin Dashboard" description="Manage Ateeq Ur Rehman portfolio data" />
 
       {/* Top Admin Header */}
-      <header className="sticky top-0 z-30 border-b border-[#F4F7FF]/12 bg-[#070B18]/95 px-4 py-3.5 sm:px-6">
+      <header className="sticky top-0 z-30 border-b border-[var(--border-subtle)] bg-[var(--bg-base)]/95 backdrop-blur-md px-4 py-3.5 sm:px-6">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="font-display text-lg font-bold text-[#F4F7FF]">
+            <span className="font-display text-lg font-bold text-[var(--text-primary)]">
               Portfolio Admin
             </span>
-            <span className="hidden font-mono text-xs text-[#00D9FF] sm:inline">
+            <span className="hidden font-mono text-xs text-[var(--accent-ink)] sm:inline">
               · {admin.email}
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <ThemeToggle compact />
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#F4F7FF]/15 bg-[#10182B] px-3.5 py-2 text-xs font-medium text-[#F4F7FF] hover:border-[#00D9FF]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3.5 py-2 text-xs font-medium text-[var(--text-primary)] hover:border-[var(--border-accent)] transition-colors"
             >
               <span>View Public Site</span>
               <ExternalLink className="h-3.5 w-3.5" />
@@ -162,7 +172,7 @@ export function AdminDashboard() {
             <button
               type="button"
               onClick={logout}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-rose-400/35 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-200 hover:bg-rose-500/20 cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/35 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-700 dark:text-rose-200 hover:bg-rose-500/20 cursor-pointer"
             >
               <LogOut className="h-3.5 w-3.5" />
               <span>Sign Out</span>
@@ -174,7 +184,10 @@ export function AdminDashboard() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-12">
         {/* Sidebar Navigation */}
         <aside className="lg:col-span-3">
-          <nav aria-label="Dashboard sections" className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-1">
+          <nav
+            aria-label="Dashboard sections"
+            className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-1"
+          >
             {TABS.map((t) => {
               const Icon = t.icon;
               const active = tab === t.id;
@@ -185,8 +198,8 @@ export function AdminDashboard() {
                   onClick={() => setTab(t.id)}
                   className={`flex items-center justify-between gap-2 rounded-xl px-3.5 py-2.5 text-xs font-medium transition-colors cursor-pointer ${
                     active
-                      ? 'bg-[#00D9FF] text-[#070B18] font-semibold'
-                      : 'border border-[#F4F7FF]/8 bg-[#10182B]/70 text-[#A6B2C9] hover:text-[#F4F7FF]'
+                      ? 'bg-[var(--accent-primary)] text-[var(--accent-on-primary)] font-semibold'
+                      : 'border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-accent)]'
                   }`}
                 >
                   <span className="flex items-center gap-2.5 truncate">
@@ -196,7 +209,7 @@ export function AdminDashboard() {
                   {t.id === 'messages' && overview && overview.counts.unreadMessages > 0 && (
                     <span
                       className={`font-mono text-[11px] tabular-nums ${
-                        active ? 'text-[#070B18]' : 'text-[#00D9FF]'
+                        active ? 'text-[var(--accent-on-primary)]' : 'text-[var(--accent-ink)]'
                       }`}
                     >
                       {overview.counts.unreadMessages}
@@ -215,8 +228,8 @@ export function AdminDashboard() {
               role="status"
               className={`rounded-xl border px-4 py-3 text-xs font-medium ${
                 toast.type === 'success'
-                  ? 'border-emerald-400/35 bg-emerald-500/15 text-emerald-200'
-                  : 'border-rose-400/35 bg-rose-500/15 text-rose-200'
+                  ? 'border-emerald-500/35 bg-emerald-500/15 text-emerald-800 dark:text-emerald-200'
+                  : 'border-rose-500/35 bg-rose-500/15 text-rose-800 dark:text-rose-200'
               }`}
             >
               {toast.text}
@@ -226,40 +239,62 @@ export function AdminDashboard() {
           {tab === 'overview' && overview && (
             <div className="space-y-6">
               <div>
-                <h1 className="font-display text-2xl font-bold text-[#F4F7FF]">
+                <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
                   Welcome, {admin.displayName}
                 </h1>
-                <p className="mt-1 text-xs text-[#A6B2C9]">
-                  Manage every section of your portfolio, CV, gallery, credentials, inbox, and
-                  Muavin AI directly from PostgreSQL.
+                <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                  Manage every section of your portfolio, Learning &amp; Journey items, CV,
+                  gallery, credentials, inbox, and Muavin AI directly from PostgreSQL.
                 </p>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
                   { label: 'Projects', val: overview.counts.projects, go: 'projects' as AdminTab },
-                  { label: 'Gallery Photos', val: overview.counts.gallery, go: 'gallery' as AdminTab },
-                  { label: 'Awards & Certs', val: overview.counts.awards + overview.counts.certificates, go: 'awards' as AdminTab },
-                  { label: 'Unread Messages', val: overview.counts.unreadMessages, go: 'messages' as AdminTab },
+                  {
+                    label: 'Learning Items',
+                    val: overview.counts.learningItems ?? portfolio.learningItems.length,
+                    go: 'learning' as AdminTab,
+                  },
+                  {
+                    label: 'Journey Milestones',
+                    val: overview.counts.journeyMilestones ?? portfolio.journeyMilestones.length,
+                    go: 'journey' as AdminTab,
+                  },
+                  {
+                    label: 'Gallery Photos',
+                    val: overview.counts.gallery,
+                    go: 'gallery' as AdminTab,
+                  },
+                  {
+                    label: 'Awards & Certs',
+                    val: overview.counts.awards + overview.counts.certificates,
+                    go: 'awards' as AdminTab,
+                  },
+                  {
+                    label: 'Unread Messages',
+                    val: overview.counts.unreadMessages,
+                    go: 'messages' as AdminTab,
+                  },
                 ].map((stat) => (
                   <button
                     key={stat.label}
                     type="button"
                     onClick={() => setTab(stat.go)}
-                    className="rounded-2xl border border-[#F4F7FF]/12 bg-[#10182B] p-5 text-left hover:border-[#00D9FF]/45 transition-colors cursor-pointer"
+                    className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 text-left hover:border-[var(--border-accent)] transition-colors cursor-pointer shadow-[var(--panel-shadow)]"
                   >
-                    <p className="font-mono text-xs text-[#A6B2C9]">{stat.label}</p>
-                    <p className="mt-2 font-display text-3xl font-bold tabular-nums text-[#00D9FF]">
+                    <p className="font-mono text-xs text-[var(--text-secondary)]">{stat.label}</p>
+                    <p className="mt-2 font-display text-3xl font-bold tabular-nums text-[var(--accent-ink)]">
                       {stat.val}
                     </p>
                   </button>
                 ))}
               </div>
 
-              <div className="rounded-2xl border border-[#F4F7FF]/12 bg-[#10182B] p-6 flex flex-wrap items-center justify-between gap-4">
+              <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 flex flex-wrap items-center justify-between gap-4 shadow-[var(--panel-shadow)]">
                 <div>
-                  <p className="font-mono text-xs text-[#00D9FF]">CV DOCUMENT STATUS</p>
-                  <p className="mt-1 text-sm font-semibold text-[#F4F7FF]">
+                  <p className="font-mono text-xs text-[var(--accent-ink)]">CV DOCUMENT STATUS</p>
+                  <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
                     {overview.activeCv
                       ? `Active: ${overview.activeCv.originalFilename}`
                       : 'No PDF CV uploaded yet — upload one to enable direct public downloads.'}
@@ -268,7 +303,7 @@ export function AdminDashboard() {
                 <button
                   type="button"
                   onClick={() => setTab('cv')}
-                  className="rounded-lg bg-[#00D9FF] px-4 py-2 text-xs font-semibold text-[#070B18] cursor-pointer"
+                  className="rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-xs font-semibold text-[var(--accent-on-primary)] hover:bg-[var(--accent-primary-hover)] cursor-pointer transition-colors"
                 >
                   Manage CV
                 </button>
@@ -290,6 +325,8 @@ export function AdminDashboard() {
           {(tab === 'skills' ||
             tab === 'educations' ||
             tab === 'experiences' ||
+            tab === 'learning' ||
+            tab === 'journey' ||
             tab === 'teachings') && (
             <AcademicPanels section={tab} onSaved={handleSaved} notify={notify} />
           )}

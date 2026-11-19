@@ -7,6 +7,7 @@ interface GeometricSceneProps {
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
   position?: [number, number, number];
   scale?: number;
+  isDark?: boolean;
 }
 
 const _targetRot = new THREE.Vector2();
@@ -16,6 +17,7 @@ export function GeometricScene({
   pointerRef,
   position = [0, 0, 0],
   scale = 1,
+  isDark = true,
 }: GeometricSceneProps) {
   const rootRef = useRef<THREE.Group>(null);
   const innerCoreRef = useRef<THREE.Mesh>(null);
@@ -26,7 +28,12 @@ export function GeometricScene({
   const knotRef = useRef<THREE.Mesh>(null);
   const nodesRef = useRef<THREE.Group>(null);
 
-  // Parametric closed mathematical curve (3D Lissajous/Harmonic filament)
+  const primaryHex = isDark ? '#007BA7' : '#173B63';
+  const primaryGlow = isDark ? '#38B6E6' : '#255B96';
+  const secondaryHex = isDark ? '#FF2D95' : '#D81B78';
+  const neutralHex = isDark ? '#A7B0BE' : '#536579';
+  const coreHex = isDark ? '#15161B' : '#14253D';
+
   const filamentGeometry = useMemo(() => {
     const pts: THREE.Vector3[] = [];
     const steps = 96;
@@ -90,93 +97,88 @@ export function GeometricScene({
 
   return (
     <group ref={rootRef} position={position} scale={scale}>
-      {/* Part 1: Luminous inner harmonic core */}
       <mesh ref={innerCoreRef}>
         <octahedronGeometry args={[0.62, 0]} />
         <meshPhysicalMaterial
-          color="#132347"
-          emissive="#00D9FF"
-          emissiveIntensity={0.45}
+          color={coreHex}
+          emissive={primaryHex}
+          emissiveIntensity={isDark ? 0.5 : 0.22}
           metalness={0.85}
-          roughness={0.18}
+          roughness={0.2}
           clearcoat={0.8}
         />
       </mesh>
 
-      {/* Part 2: Outer faceted geodesic wireframe manifold */}
       <mesh ref={outerShellRef}>
         <icosahedronGeometry args={[1.28, 1]} />
         <meshStandardMaterial
-          color="#00D9FF"
-          emissive="#00D9FF"
-          emissiveIntensity={0.25}
+          color={primaryGlow}
+          emissive={primaryHex}
+          emissiveIntensity={isDark ? 0.28 : 0.12}
           wireframe
           transparent
-          opacity={0.42}
+          opacity={isDark ? 0.42 : 0.32}
         />
       </mesh>
 
-      {/* Part 3-5: Three inclined precision orbital rings */}
       <mesh ref={ringARef} rotation={[Math.PI / 3, 0.2, 0]}>
         <torusGeometry args={[1.82, 0.022, 16, 120]} />
         <meshStandardMaterial
-          color="#00D9FF"
-          emissive="#00D9FF"
-          emissiveIntensity={0.45}
-          metalness={0.9}
-          roughness={0.15}
+          color={primaryHex}
+          emissive={primaryGlow}
+          emissiveIntensity={isDark ? 0.42 : 0.18}
+          metalness={0.88}
+          roughness={0.18}
         />
       </mesh>
 
       <mesh ref={ringBRef} rotation={[-Math.PI / 3.4, Math.PI / 5, 0.4]}>
         <torusGeometry args={[2.08, 0.018, 16, 120]} />
         <meshStandardMaterial
-          color="#8957FF"
-          emissive="#8957FF"
-          emissiveIntensity={0.5}
-          metalness={0.88}
-          roughness={0.2}
+          color={secondaryHex}
+          emissive={secondaryHex}
+          emissiveIntensity={isDark ? 0.45 : 0.18}
+          metalness={0.85}
+          roughness={0.22}
         />
       </mesh>
 
       <mesh ref={ringCRef} rotation={[Math.PI / 2.1, -Math.PI / 4, 0]}>
         <torusGeometry args={[2.34, 0.012, 12, 120]} />
         <meshStandardMaterial
-          color="#A6B2C9"
-          metalness={0.92}
-          roughness={0.28}
+          color={neutralHex}
+          metalness={0.85}
+          roughness={0.3}
           transparent
-          opacity={0.7}
+          opacity={isDark ? 0.68 : 0.55}
         />
       </mesh>
 
-      {/* Part 6: Parametric closed harmonic tube */}
       <mesh ref={knotRef} geometry={filamentGeometry}>
         <meshStandardMaterial
-          color="#7CE8FF"
-          emissive="#8957FF"
-          emissiveIntensity={0.35}
+          color={primaryGlow}
+          emissive={secondaryHex}
+          emissiveIntensity={isDark ? 0.28 : 0.12}
           metalness={0.7}
-          roughness={0.25}
+          roughness={0.26}
         />
       </mesh>
 
-      {/* Part 7: Orbiting mathematical vertex nodes */}
       <group ref={nodesRef}>
         {[
-          [1.82, 0, 0, '#00D9FF'],
-          [-1.82, 0, 0, '#8957FF'],
-          [0, 1.48, 1.48, '#F4F7FF'],
-          [0, -1.48, -1.48, '#00D9FF'],
+          [1.82, 0, 0, primaryGlow],
+          [-1.82, 0, 0, secondaryHex],
+          [0, 1.48, 1.48, isDark ? '#F8FAFC' : '#14253D'],
+          [0, -1.48, -1.48, primaryHex],
         ].map(([x, y, z, col], i) => (
           <mesh key={i} position={[x as number, y as number, z as number]}>
             <sphereGeometry args={[0.075, 16, 16]} />
             <meshStandardMaterial
               color={col as string}
               emissive={col as string}
-              emissiveIntensity={0.85}
-              roughness={0.2}
-              metalness={0.4}
+              emissiveIntensity={isDark ? 0.75 : 0.25}
+              roughness={0.22}
+              metalness={0.45}
             />
           </mesh>
         ))}

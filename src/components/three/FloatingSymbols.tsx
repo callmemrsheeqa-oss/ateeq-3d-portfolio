@@ -7,6 +7,7 @@ interface FloatingSymbolsProps {
   reducedMotion: boolean;
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
   density?: 'hero' | 'ambient';
+  isDark?: boolean;
 }
 
 interface SymbolSpec {
@@ -45,13 +46,18 @@ const SYMBOLS = [
   'G/N',
 ];
 
-const PALETTE = ['#00D9FF', '#8957FF', '#F4F7FF', '#7CE8FF', '#B79BFF'];
+const DARK_PALETTE = ['#007BA7', '#38B6E6', '#FF2D95', '#F8FAFC', '#A7B0BE'];
+const LIGHT_PALETTE = ['#173B63', '#2B5B8F', '#D81B78', '#14253D', '#536579'];
 
-// Pre-allocated scratch vectors to keep useFrame GC-free
 const _pointerWorld = new THREE.Vector3();
 const _delta = new THREE.Vector3();
 
-function createSymbolTexture(label: string, color: string, maxAnisotropy: number): {
+function createSymbolTexture(
+  label: string,
+  color: string,
+  maxAnisotropy: number,
+  isDark: boolean,
+): {
   texture: THREE.CanvasTexture;
   aspect: number;
 } {
@@ -66,9 +72,8 @@ function createSymbolTexture(label: string, color: string, maxAnisotropy: number
   if (ctx) {
     ctx.clearRect(0, 0, width, height);
 
-    // Subtle soft glow behind glyph
     ctx.shadowColor = color;
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = isDark ? 16 : 6;
     ctx.fillStyle = color;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -96,6 +101,7 @@ export function FloatingSymbols({
   reducedMotion,
   pointerRef,
   density = 'ambient',
+  isDark = true,
 }: FloatingSymbolsProps) {
   const { gl } = useThree();
   const groupRefs = useRef<Array<THREE.Mesh | null>>([]);
@@ -104,14 +110,14 @@ export function FloatingSymbols({
 
   const symbolItems = useMemo(() => {
     const maxAniso = gl.capabilities.getMaxAnisotropy();
+    const palette = isDark ? DARK_PALETTE : LIGHT_PALETTE;
     const items: Array<SymbolSpec & { texture: THREE.CanvasTexture }> = [];
 
     for (let i = 0; i < count; i++) {
       const label = SYMBOLS[i % SYMBOLS.length];
-      const color = PALETTE[i % PALETTE.length];
-      const { texture, aspect } = createSymbolTexture(label, color, maxAniso);
+      const color = palette[i % palette.length];
+      const { texture, aspect } = createSymbolTexture(label, color, maxAniso, isDark);
 
-      // Distribute across a wide 3D volume, keeping center clear enough for text readability
       const angle = (i / count) * Math.PI * 2 + pseudoRandom(i + 1) * 0.65;
       const radiusX = 3.2 + pseudoRandom(i + 11) * (isMobile ? 3.5 : 7.8);
       const y = (pseudoRandom(i + 23) - 0.5) * (isMobile ? 7.0 : 8.5);
@@ -120,6 +126,13 @@ export function FloatingSymbols({
 
       const scaleBase = label.length > 2 ? 0.65 : 0.52;
       const scale = scaleBase + pseudoRandom(i + 51) * 0.48;
+      const baseOpacity = isDark
+        ? density === 'hero'
+          ? 0.28 + pseudoRandom(i + 67) * 0.36
+          : 0.16 + pseudoRandom(i + 67) * 0.22
+        : density === 'hero'
+          ? 0.22 + pseudoRandom(i + 67) * 0.24
+          : 0.14 + pseudoRandom(i + 67) * 0.18;
 
       items.push({
         id: i,
@@ -128,7 +141,7 @@ export function FloatingSymbols({
         scale,
         aspect,
         color,
-        opacity: density === 'hero' ? 0.28 + pseudoRandom(i + 67) * 0.38 : 0.16 + pseudoRandom(i + 67) * 0.22,
+        opacity: baseOpacity,
         speed: 0.22 + pseudoRandom(i + 79) * 0.28,
         phase: pseudoRandom(i + 97) * Math.PI * 2,
         driftAmp: 0.28 + pseudoRandom(i + 109) * 0.35,
@@ -139,7 +152,7 @@ export function FloatingSymbols({
     }
 
     return items;
-  }, [count, density, gl, isMobile]);
+  }, [count, density, gl, isMobile, isDark]);
 
   useEffect(() => {
     return () => {

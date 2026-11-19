@@ -11,11 +11,11 @@ export function NotFound() {
       />
 
       <div className="mx-auto flex min-h-[65vh] max-w-3xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6">
-        <p className="font-mono text-sm text-[#00D9FF]">∅ · ERROR 404</p>
-        <h1 className="mt-4 font-display text-4xl font-bold tracking-tight text-[#F4F7FF] sm:text-5xl">
+        <p className="font-mono text-sm text-[var(--accent-ink)]">∅ · ERROR 404</p>
+        <h1 className="mt-4 font-display text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl">
           This coordinate lies outside the domain.
         </h1>
-        <p className="mt-4 max-w-md text-sm leading-relaxed text-[#A6B2C9]">
+        <p className="mt-4 max-w-md text-sm leading-relaxed text-[var(--text-secondary)]">
           The page you requested could not be found. Return to the main mathematical universe or
           browse selected projects.
         </p>

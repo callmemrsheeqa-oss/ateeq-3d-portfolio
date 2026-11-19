@@ -6,6 +6,7 @@ interface ParticleFieldProps {
   isMobile: boolean;
   reducedMotion: boolean;
   pointerRef: React.MutableRefObject<{ x: number; y: number }>;
+  isDark?: boolean;
 }
 
 function seeded(i: number): number {
@@ -13,7 +14,12 @@ function seeded(i: number): number {
   return v - Math.floor(v);
 }
 
-export function ParticleField({ isMobile, reducedMotion, pointerRef }: ParticleFieldProps) {
+export function ParticleField({
+  isMobile,
+  reducedMotion,
+  pointerRef,
+  isDark = true,
+}: ParticleFieldProps) {
   const pointsRef = useRef<THREE.Points>(null);
   const gridRef = useRef<THREE.Group>(null);
   const count = isMobile ? 110 : 240;
@@ -22,12 +28,11 @@ export function ParticleField({ isMobile, reducedMotion, pointerRef }: ParticleF
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
 
-    const cyan = new THREE.Color('#00D9FF');
-    const violet = new THREE.Color('#8957FF');
-    const softWhite = new THREE.Color('#F4F7FF');
+    const primary = new THREE.Color(isDark ? '#007BA7' : '#173B63');
+    const secondary = new THREE.Color(isDark ? '#FF2D95' : '#D81B78');
+    const neutral = new THREE.Color(isDark ? '#F8FAFC' : '#536579');
 
     for (let i = 0; i < count; i++) {
-      // Fibonacci-like spherical distribution mixed with ambient depth
       const u = seeded(i + 1);
       const v = seeded(i + 201);
       const theta = u * Math.PI * 2;
@@ -39,7 +44,7 @@ export function ParticleField({ isMobile, reducedMotion, pointerRef }: ParticleF
       positions[i * 3 + 2] = -4 - seeded(i + 601) * 12;
 
       const pick = seeded(i + 801);
-      const c = pick < 0.45 ? cyan : pick < 0.8 ? violet : softWhite;
+      const c = pick < 0.5 ? primary : pick < 0.78 ? neutral : secondary;
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
@@ -49,7 +54,7 @@ export function ParticleField({ isMobile, reducedMotion, pointerRef }: ParticleF
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     return { geometry: geo };
-  }, [count]);
+  }, [count, isDark]);
 
   useEffect(() => {
     return () => {
@@ -89,7 +94,7 @@ export function ParticleField({ isMobile, reducedMotion, pointerRef }: ParticleF
           size={isMobile ? 0.055 : 0.048}
           vertexColors
           transparent
-          opacity={0.55}
+          opacity={isDark ? 0.55 : 0.45}
           sizeAttenuation
           depthWrite={false}
         />
@@ -99,7 +104,12 @@ export function ParticleField({ isMobile, reducedMotion, pointerRef }: ParticleF
       <group ref={gridRef} position={[0, 0, -9]}>
         <mesh rotation={[Math.PI / 5, Math.PI / 7, 0]}>
           <icosahedronGeometry args={[7.5, 1]} />
-          <meshBasicMaterial color="#1E2B4D" wireframe transparent opacity={0.18} />
+          <meshBasicMaterial
+            color={isDark ? '#27364A' : '#B7C7DA'}
+            wireframe
+            transparent
+            opacity={isDark ? 0.2 : 0.35}
+          />
         </mesh>
       </group>
     </group>

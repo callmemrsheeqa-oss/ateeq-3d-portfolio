@@ -44,35 +44,35 @@ export function GalleryLightbox({
       role="dialog"
       aria-modal="true"
       aria-label={`Viewing ${current.title}`}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#040711]/94 p-4 sm:p-8"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 sm:p-8"
       onClick={onClose}
     >
       <div
-        className="relative flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-[#F4F7FF]/15 bg-[#070B18] shadow-2xl"
+        className="relative flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Metadata Bar */}
-        <div className="flex items-center justify-between gap-4 border-b border-[#F4F7FF]/10 px-5 py-3.5">
+        <div className="flex items-center justify-between gap-4 border-b border-[var(--border-subtle)] px-5 py-3.5">
           <div className="min-w-0">
-            <p className="font-mono text-xs text-[#00D9FF]">
+            <p className="font-mono text-xs text-[var(--accent-ink)]">
               {current.category} · {String(activeIndex + 1).padStart(2, '0')} /{' '}
               {String(images.length).padStart(2, '0')}
             </p>
-            <h2 className="truncate text-base font-semibold text-[#F4F7FF]">{current.title}</h2>
+            <h2 className="truncate text-base font-semibold text-[var(--text-primary)]">
+              {current.title}
+            </h2>
           </div>
 
           <button
             type="button"
             onClick={onClose}
             aria-label="Close lightbox"
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#F4F7FF]/15 bg-[#10182B] text-[#F4F7FF] hover:border-[#00D9FF] transition-colors cursor-pointer"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-base)] text-[var(--text-primary)] hover:border-[var(--border-accent)] transition-colors cursor-pointer"
           >
             <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
 
-        {/* Image Stage */}
-        <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#040711] p-2 sm:p-4">
+        <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-black/90 p-2 sm:p-4">
           <img
             src={current.imageUrl}
             alt={current.title}
@@ -85,7 +85,7 @@ export function GalleryLightbox({
                 type="button"
                 onClick={() => onChangeIndex((activeIndex - 1 + images.length) % images.length)}
                 aria-label="Previous image"
-                className="absolute left-3 top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#F4F7FF]/15 bg-[#10182B]/90 text-[#F4F7FF] hover:border-[#00D9FF] hover:text-[#00D9FF] transition-colors cursor-pointer"
+                className="absolute left-3 top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/75 text-white hover:border-[var(--accent-ink)] transition-colors cursor-pointer"
               >
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -93,7 +93,7 @@ export function GalleryLightbox({
                 type="button"
                 onClick={() => onChangeIndex((activeIndex + 1) % images.length)}
                 aria-label="Next image"
-                className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#F4F7FF]/15 bg-[#10182B]/90 text-[#F4F7FF] hover:border-[#00D9FF] hover:text-[#00D9FF] transition-colors cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/75 text-white hover:border-[var(--accent-ink)] transition-colors cursor-pointer"
               >
                 <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -101,9 +101,8 @@ export function GalleryLightbox({
           )}
         </div>
 
-        {/* Caption Bar */}
         {current.caption && (
-          <div className="border-t border-[#F4F7FF]/10 px-5 py-3.5 text-sm text-[#A6B2C9]">
+          <div className="border-t border-[var(--border-subtle)] px-5 py-3.5 text-sm text-[var(--text-secondary)]">
             {current.caption}
           </div>
         )}

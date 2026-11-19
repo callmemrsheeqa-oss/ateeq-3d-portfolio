@@ -6,6 +6,8 @@ import {
   createAdminCertificate,
   createAdminEducation,
   createAdminExperience,
+  createAdminJourney,
+  createAdminLearning,
   createAdminProject,
   createAdminSkill,
   createAdminSocial,
@@ -17,6 +19,8 @@ import {
   deleteAdminEducation,
   deleteAdminExperience,
   deleteAdminGalleryImage,
+  deleteAdminJourney,
+  deleteAdminLearning,
   deleteAdminMessage,
   deleteAdminProject,
   deleteAdminSkill,
@@ -30,6 +34,8 @@ import {
   listAdminEducations,
   listAdminExperiences,
   listAdminGallery,
+  listAdminJourney,
+  listAdminLearning,
   listAdminMessages,
   listAdminProjects,
   listAdminSkills,
@@ -43,6 +49,8 @@ import {
   updateAdminEducation,
   updateAdminExperience,
   updateAdminGalleryImage,
+  updateAdminJourney,
+  updateAdminLearning,
   updateAdminProfile,
   updateAdminProject,
   updateAdminSettings,
@@ -117,6 +125,16 @@ adminRouter.get('/teachings', listAdminTeachings);
 adminRouter.post('/teachings', createAdminTeaching);
 adminRouter.put('/teachings/:id', updateAdminTeaching);
 adminRouter.delete('/teachings/:id', deleteAdminTeaching);
+
+adminRouter.get('/learning', listAdminLearning);
+adminRouter.post('/learning', createAdminLearning);
+adminRouter.put('/learning/:id', updateAdminLearning);
+adminRouter.delete('/learning/:id', deleteAdminLearning);
+
+adminRouter.get('/journey', listAdminJourney);
+adminRouter.post('/journey', createAdminJourney);
+adminRouter.put('/journey/:id', updateAdminJourney);
+adminRouter.delete('/journey/:id', deleteAdminJourney);
 
 adminRouter.get('/cv', listAdminCvs);
 adminRouter.post('/cv/upload', cvUpload.single('file'), uploadAdminCv);

@@ -33,11 +33,11 @@ export function Gallery() {
 
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 lg:px-8 lg:pt-16">
         <header>
-          <p className="font-mono text-xs tracking-wider text-[#00D9FF]">VISUAL ARCHIVE</p>
-          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[#F4F7FF] sm:text-5xl">
+          <p className="font-mono text-xs tracking-wider text-[var(--accent-ink)]">VISUAL ARCHIVE</p>
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl">
             Photo Gallery
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#A6B2C9]">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--text-secondary)]">
             Moments from university life at CASPAM (BZU), developer community sessions, teaching,
             and project showcases.
           </p>
@@ -47,7 +47,7 @@ export function Gallery() {
           <div
             role="tablist"
             aria-label="Filter gallery by category"
-            className="mt-10 inline-flex flex-wrap items-center gap-1.5 rounded-xl border border-[#F4F7FF]/12 bg-[#10182B]/75 p-1.5"
+            className="mt-10 inline-flex flex-wrap items-center gap-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-1.5"
           >
             {categories.map((cat) => {
               const selected = activeCategory === cat;
@@ -66,8 +66,8 @@ export function Gallery() {
                   }}
                   className={`rounded-lg px-3.5 py-2 text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                     selected
-                      ? 'bg-[#00D9FF] text-[#070B18] font-semibold'
-                      : 'text-[#A6B2C9] hover:text-[#F4F7FF]'
+                      ? 'bg-[var(--accent-primary)] text-[var(--accent-on-primary)] font-semibold'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
                 >
                   <span>{cat}</span>
@@ -81,13 +81,13 @@ export function Gallery() {
         <RevealSection className="mt-10">
           {filtered.length === 0 ? (
             <div className="glass-panel flex flex-col items-center justify-center rounded-2xl px-6 py-16 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[#F4F7FF]/12 bg-[#070B18] text-[#00D9FF]">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--accent-ink)]">
                 <ImageIcon className="h-6 w-6" aria-hidden="true" />
               </div>
-              <h2 className="mt-5 font-display text-xl font-semibold text-[#F4F7FF]">
+              <h2 className="mt-5 font-display text-xl font-semibold text-[var(--text-primary)]">
                 {loading ? 'Loading gallery...' : 'No gallery photos published yet'}
               </h2>
-              <p className="mt-2 max-w-md text-sm leading-relaxed text-[#A6B2C9]">
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--text-secondary)]">
                 This gallery displays only authentic photographs uploaded through the portfolio
                 dashboard—no stock or placeholder photos are ever inserted.
               </p>
@@ -103,7 +103,7 @@ export function Gallery() {
                     type="button"
                     onClick={() => setLightboxIndex(idx)}
                     aria-label={`Open ${item.title} in fullscreen lightbox`}
-                    className="relative aspect-[4/3] w-full overflow-hidden bg-[#070B18] text-left cursor-pointer focus:outline-none"
+                    className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--bg-base)] text-left cursor-pointer focus:outline-none"
                   >
                     <img
                       src={item.imageUrl}
@@ -111,17 +111,19 @@ export function Gallery() {
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                     />
-                    <span className="pointer-events-none absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#F4F7FF]/15 bg-[#070B18]/85 text-[#F4F7FF] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                    <span className="pointer-events-none absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]/90 text-[var(--text-primary)] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                       <Expand className="h-4 w-4" aria-hidden="true" />
                     </span>
                   </button>
 
                   <div className="flex flex-1 flex-col justify-between p-5">
                     <div>
-                      <p className="font-mono text-xs text-[#00D9FF]">{item.category}</p>
-                      <h2 className="mt-1.5 text-lg font-semibold text-[#F4F7FF]">{item.title}</h2>
+                      <p className="font-mono text-xs text-[var(--accent-ink)]">{item.category}</p>
+                      <h2 className="mt-1.5 text-lg font-semibold text-[var(--text-primary)]">
+                        {item.title}
+                      </h2>
                       {item.caption && (
-                        <p className="mt-1.5 text-sm leading-relaxed text-[#A6B2C9]">
+                        <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-secondary)]">
                           {item.caption}
                         </p>
                       )}

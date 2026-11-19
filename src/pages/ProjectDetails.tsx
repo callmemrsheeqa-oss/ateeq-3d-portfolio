@@ -41,8 +41,8 @@ export function ProjectDetails() {
     return (
       <div className="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6">
         <PageMeta title="Project Not Found" description="Requested project could not be located." />
-        <p className="font-mono text-xs text-[#00D9FF]">404 · PROJECT NOT FOUND</p>
-        <h1 className="mt-3 font-display text-3xl font-bold text-[#F4F7FF]">
+        <p className="font-mono text-xs text-[var(--accent-ink)]">404 · PROJECT NOT FOUND</p>
+        <h1 className="mt-3 font-display text-3xl font-bold text-[var(--text-primary)]">
           That project entry does not exist.
         </h1>
         <div className="mt-8">
@@ -67,7 +67,7 @@ export function ProjectDetails() {
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 lg:px-8 lg:pt-14">
         <Link
           to="/projects"
-          className="inline-flex items-center gap-2 text-sm font-medium text-[#A6B2C9] hover:text-[#00D9FF] transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--accent-ink)] transition-colors"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           <span>All Projects</span>
@@ -76,21 +76,23 @@ export function ProjectDetails() {
         {/* Header & Interactive 3D Visual */}
         <div className="mt-8 grid items-stretch gap-10 lg:grid-cols-12">
           <div className="flex flex-col justify-center lg:col-span-7">
-            <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[#A6B2C9]">
-              <span className="text-[#00D9FF]">{project.indexLabel}</span>
+            <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[var(--text-secondary)]">
+              <span className="text-[var(--accent-ink)]">{project.indexLabel}</span>
               <span aria-hidden="true">/</span>
               <span>{project.category}</span>
               <span aria-hidden="true">·</span>
               <span>{project.status}</span>
             </div>
 
-            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-[#F4F7FF] sm:text-4xl lg:text-5xl">
+            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] sm:text-4xl lg:text-5xl">
               {project.title}
             </h1>
 
-            <p className="mt-4 text-base leading-relaxed text-[#A6B2C9]">{project.summary}</p>
+            <p className="mt-4 text-base leading-relaxed text-[var(--text-secondary)]">
+              {project.summary}
+            </p>
 
-            <p className="mt-5 font-mono text-xs leading-relaxed text-[#00D9FF]">
+            <p className="mt-5 font-mono text-xs leading-relaxed text-[var(--accent-ink)]">
               {project.techStack.join(' · ')}
             </p>
 
@@ -120,7 +122,7 @@ export function ProjectDetails() {
               )}
 
               {!project.githubUrl && !project.liveUrl && (
-                <p className="rounded-lg border border-[#F4F7FF]/12 bg-[#10182B]/70 px-4 py-2.5 text-xs text-[#A6B2C9]">
+                <p className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-2.5 text-xs text-[var(--text-secondary)]">
                   Local build / private research workspace — no fabricated public URL is listed.
                 </p>
               )}
@@ -133,7 +135,7 @@ export function ProjectDetails() {
                 variant={(project.motif || 'group-symmetry') as ArtworkVariant}
                 className="h-72 w-full sm:h-80"
               />
-              <div className="mt-3 flex items-center justify-between px-1 font-mono text-xs text-[#A6B2C9]">
+              <div className="mt-3 flex items-center justify-between px-1 font-mono text-xs text-[var(--text-secondary)]">
                 <span>Symbol {project.mathSymbol}</span>
                 <span>Drag to orbit 3D manifold</span>
               </div>
@@ -144,20 +146,28 @@ export function ProjectDetails() {
         {/* Structured Technical & Mathematical Breakdown */}
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           <section className="glass-panel rounded-2xl p-6">
-            <h2 className="font-mono text-xs tracking-wider text-[#00D9FF]">01 · PROBLEM</h2>
-            <p className="mt-3 text-sm leading-relaxed text-[#A6B2C9]">{project.problem}</p>
+            <h2 className="font-mono text-xs tracking-wider text-[var(--accent-ink)]">
+              01 · PROBLEM
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+              {project.problem}
+            </p>
           </section>
 
           <section className="glass-panel rounded-2xl p-6">
-            <h2 className="font-mono text-xs tracking-wider text-[#00D9FF]">02 · APPROACH</h2>
-            <p className="mt-3 text-sm leading-relaxed text-[#A6B2C9]">{project.approach}</p>
+            <h2 className="font-mono text-xs tracking-wider text-[var(--accent-ink)]">
+              02 · APPROACH
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+              {project.approach}
+            </p>
           </section>
 
           <section className="glass-panel rounded-2xl p-6">
-            <h2 className="font-mono text-xs tracking-wider text-[#8957FF]">
+            <h2 className="font-mono text-xs tracking-wider text-[var(--accent-secondary-ink)]">
               03 · MATHEMATICAL LINK
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-[#A6B2C9]">
+            <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
               {project.mathematicalConnection}
             </p>
           </section>
@@ -166,11 +176,13 @@ export function ProjectDetails() {
         {/* Features & Transparent Notes */}
         <div className="mt-8 grid gap-6 lg:grid-cols-12">
           <section className="glass-panel rounded-2xl p-6 lg:col-span-7">
-            <h2 className="text-lg font-semibold text-[#F4F7FF]">Key Capabilities &amp; Scope</h2>
-            <ul className="mt-4 space-y-2.5 text-sm text-[#A6B2C9]">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+              Key Capabilities &amp; Scope
+            </h2>
+            <ul className="mt-4 space-y-2.5 text-sm text-[var(--text-secondary)]">
               {project.features.map((feat, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="pt-1 font-mono text-xs text-[#00D9FF]">
+                  <span className="pt-1 font-mono text-xs text-[var(--accent-ink)]">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <span>{feat}</span>
@@ -180,11 +192,18 @@ export function ProjectDetails() {
           </section>
 
           <section className="glass-panel rounded-2xl p-6 lg:col-span-5">
-            <h2 className="text-lg font-semibold text-[#F4F7FF]">Status &amp; Transparency Note</h2>
-            <p className="mt-3 text-sm leading-relaxed text-[#A6B2C9]">{project.notes}</p>
-            <div className="mt-6 border-t border-[#F4F7FF]/10 pt-4 text-xs text-[#A6B2C9]">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+              Status &amp; Transparency Note
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+              {project.notes}
+            </p>
+            <div className="mt-6 border-t border-[var(--border-subtle)] pt-4 text-xs text-[var(--text-secondary)]">
               Interested in discussing this architecture?{' '}
-              <Link to="/contact" className="font-medium text-[#00D9FF] hover:underline">
+              <Link
+                to="/contact"
+                className="font-medium text-[var(--accent-ink)] hover:underline"
+              >
                 Send an enquiry
               </Link>
               .
@@ -195,16 +214,18 @@ export function ProjectDetails() {
         {/* Next / Previous Project Navigation */}
         <nav
           aria-label="Adjacent projects"
-          className="mt-14 grid gap-4 border-t border-[#F4F7FF]/10 pt-8 sm:grid-cols-2"
+          className="mt-14 grid gap-4 border-t border-[var(--border-subtle)] pt-8 sm:grid-cols-2"
         >
           <Link
             to={`/projects/${prevProject.slug}`}
             className="glass-panel glass-panel-hover flex items-center gap-3 rounded-xl p-4"
           >
-            <ArrowLeft className="h-4 w-4 shrink-0 text-[#00D9FF]" aria-hidden="true" />
+            <ArrowLeft className="h-4 w-4 shrink-0 text-[var(--accent-ink)]" aria-hidden="true" />
             <div className="min-w-0">
-              <p className="font-mono text-xs text-[#A6B2C9]">Previous</p>
-              <p className="truncate text-sm font-semibold text-[#F4F7FF]">{prevProject.title}</p>
+              <p className="font-mono text-xs text-[var(--text-secondary)]">Previous</p>
+              <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                {prevProject.title}
+              </p>
             </div>
           </Link>
 
@@ -213,10 +234,12 @@ export function ProjectDetails() {
             className="glass-panel glass-panel-hover flex items-center justify-end gap-3 rounded-xl p-4 text-right"
           >
             <div className="min-w-0">
-              <p className="font-mono text-xs text-[#A6B2C9]">Next</p>
-              <p className="truncate text-sm font-semibold text-[#F4F7FF]">{nextProject.title}</p>
+              <p className="font-mono text-xs text-[var(--text-secondary)]">Next</p>
+              <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                {nextProject.title}
+              </p>
             </div>
-            <ArrowRight className="h-4 w-4 shrink-0 text-[#00D9FF]" aria-hidden="true" />
+            <ArrowRight className="h-4 w-4 shrink-0 text-[var(--accent-ink)]" aria-hidden="true" />
           </Link>
         </nav>
       </div>

@@ -11,6 +11,8 @@ import {
   educations,
   experiences,
   galleryImages,
+  journeyMilestones,
+  learningItems,
   profiles,
   projects,
   siteSettings,
@@ -64,6 +66,8 @@ export async function getAdminOverview(_req: AdminRequest, res: Response): Promi
       [unreadMsgCount],
       [totalMsgCount],
       [aiCount],
+      [learningCount],
+      [journeyCount],
       activeCvRows,
       profileRows,
       settingsRows,
@@ -82,6 +86,8 @@ export async function getAdminOverview(_req: AdminRequest, res: Response): Promi
         .where(eq(contactMessages.isRead, false)),
       db.select({ value: count() }).from(contactMessages),
       db.select({ value: count() }).from(aiKnowledge),
+      db.select({ value: count() }).from(learningItems),
+      db.select({ value: count() }).from(journeyMilestones),
       db
         .select()
         .from(cvDocuments)
@@ -106,6 +112,8 @@ export async function getAdminOverview(_req: AdminRequest, res: Response): Promi
         unreadMessages: unreadMsgCount.value,
         totalMessages: totalMsgCount.value,
         aiKnowledge: aiCount.value,
+        learningItems: learningCount.value,
+        journeyMilestones: journeyCount.value,
       },
       activeCv: activeCvRows[0] || null,
       profile: profileRows[0] || null,
@@ -227,6 +235,17 @@ export async function updateAdminSettings(req: AdminRequest, res: Response): Pro
           typeof b.muavinSystemTone === 'string' && b.muavinSystemTone.trim()
             ? b.muavinSystemTone.trim()
             : current.muavinSystemTone,
+        muavinSuggestedQuestions:
+          b.muavinSuggestedQuestions !== undefined
+            ? Array.isArray(b.muavinSuggestedQuestions)
+              ? b.muavinSuggestedQuestions.map((q) => String(q).trim()).filter(Boolean)
+              : typeof b.muavinSuggestedQuestions === 'string'
+                ? b.muavinSuggestedQuestions
+                    .split('\n')
+                    .map((q) => q.trim())
+                    .filter(Boolean)
+                : current.muavinSuggestedQuestions
+            : current.muavinSuggestedQuestions,
         teachingHeadline:
           typeof b.teachingHeadline === 'string' && b.teachingHeadline.trim()
             ? b.teachingHeadline.trim()
@@ -730,6 +749,164 @@ export async function deleteAdminTeaching(req: AdminRequest, res: Response): Pro
     return;
   }
   await db.delete(teachings).where(eq(teachings.id, id));
+  res.status(200).json({ ok: true });
+}
+
+/* ==================== LEARNING ITEMS CRUD ==================== */
+export async function listAdminLearning(_req: AdminRequest, res: Response): Promise<void> {
+  const rows = await db
+    .select()
+    .from(learningItems)
+    .orderBy(asc(learningItems.sortOrder), asc(learningItems.id));
+  res.status(200).json({ ok: true, items: rows });
+}
+
+export async function createAdminLearning(req: AdminRequest, res: Response): Promise<void> {
+  const b = req.body as Record<string, unknown>;
+  const category = typeof b.category === 'string' ? b.category.trim() : '';
+  const title = typeof b.title === 'string' ? b.title.trim() : '';
+  if (!category || !title) {
+    res.status(400).json({ ok: false, error: 'Category and title are required.' });
+    return;
+  }
+  const [created] = await db
+    .insert(learningItems)
+    .values({
+      indexLabel:
+        typeof b.indexLabel === 'string' && b.indexLabel.trim() ? b.indexLabel.trim() : '05',
+      category,
+      title,
+      focus: typeof b.focus === 'string' ? b.focus.trim() : '',
+      resources: asStringArray(b.resources),
+      status: typeof b.status === 'string' && b.status.trim() ? b.status.trim() : 'Active Study',
+      published: b.published === undefined ? true : Boolean(b.published),
+      sortOrder: Number(b.sortOrder) || 10,
+    })
+    .returning();
+  res.status(201).json({ ok: true, item: created });
+}
+
+export async function updateAdminLearning(req: AdminRequest, res: Response): Promise<void> {
+  const id = parseId(req.params.id);
+  if (!id) {
+    res.status(400).json({ ok: false, error: 'Invalid learning item ID.' });
+    return;
+  }
+  const b = req.body as Record<string, unknown>;
+  const existing = await db.select().from(learningItems).where(eq(learningItems.id, id)).limit(1);
+  if (existing.length === 0) {
+    res.status(404).json({ ok: false, error: 'Learning item not found.' });
+    return;
+  }
+  const c = existing[0];
+  const [updated] = await db
+    .update(learningItems)
+    .set({
+      indexLabel: typeof b.indexLabel === 'string' ? b.indexLabel.trim() : c.indexLabel,
+      category: typeof b.category === 'string' ? b.category.trim() : c.category,
+      title: typeof b.title === 'string' ? b.title.trim() : c.title,
+      focus: typeof b.focus === 'string' ? b.focus.trim() : c.focus,
+      resources: b.resources !== undefined ? asStringArray(b.resources) : c.resources,
+      status: typeof b.status === 'string' ? b.status.trim() : c.status,
+      published: b.published === undefined ? c.published : Boolean(b.published),
+      sortOrder: b.sortOrder !== undefined ? Number(b.sortOrder) || 0 : c.sortOrder,
+      updatedAt: new Date(),
+    })
+    .where(eq(learningItems.id, id))
+    .returning();
+  res.status(200).json({ ok: true, item: updated });
+}
+
+export async function deleteAdminLearning(req: AdminRequest, res: Response): Promise<void> {
+  const id = parseId(req.params.id);
+  if (!id) {
+    res.status(400).json({ ok: false, error: 'Invalid learning item ID.' });
+    return;
+  }
+  await db.delete(learningItems).where(eq(learningItems.id, id));
+  res.status(200).json({ ok: true });
+}
+
+/* ==================== JOURNEY MILESTONES CRUD ==================== */
+export async function listAdminJourney(_req: AdminRequest, res: Response): Promise<void> {
+  const rows = await db
+    .select()
+    .from(journeyMilestones)
+    .orderBy(asc(journeyMilestones.sortOrder), asc(journeyMilestones.id));
+  res.status(200).json({ ok: true, items: rows });
+}
+
+export async function createAdminJourney(req: AdminRequest, res: Response): Promise<void> {
+  const b = req.body as Record<string, unknown>;
+  const title = typeof b.title === 'string' ? b.title.trim() : '';
+  const period = typeof b.period === 'string' ? b.period.trim() : '';
+  if (!title || !period) {
+    res.status(400).json({ ok: false, error: 'Milestone title and period are required.' });
+    return;
+  }
+  const [created] = await db
+    .insert(journeyMilestones)
+    .values({
+      indexLabel:
+        typeof b.indexLabel === 'string' && b.indexLabel.trim() ? b.indexLabel.trim() : '06',
+      period,
+      phase: typeof b.phase === 'string' && b.phase.trim() ? b.phase.trim() : 'Milestone',
+      title,
+      organization: typeof b.organization === 'string' ? b.organization.trim() : '',
+      location: typeof b.location === 'string' ? b.location.trim() : '',
+      summary: typeof b.summary === 'string' ? b.summary.trim() : '',
+      tags: asStringArray(b.tags),
+      published: b.published === undefined ? true : Boolean(b.published),
+      sortOrder: Number(b.sortOrder) || 10,
+    })
+    .returning();
+  res.status(201).json({ ok: true, item: created });
+}
+
+export async function updateAdminJourney(req: AdminRequest, res: Response): Promise<void> {
+  const id = parseId(req.params.id);
+  if (!id) {
+    res.status(400).json({ ok: false, error: 'Invalid journey milestone ID.' });
+    return;
+  }
+  const b = req.body as Record<string, unknown>;
+  const existing = await db
+    .select()
+    .from(journeyMilestones)
+    .where(eq(journeyMilestones.id, id))
+    .limit(1);
+  if (existing.length === 0) {
+    res.status(404).json({ ok: false, error: 'Journey milestone not found.' });
+    return;
+  }
+  const c = existing[0];
+  const [updated] = await db
+    .update(journeyMilestones)
+    .set({
+      indexLabel: typeof b.indexLabel === 'string' ? b.indexLabel.trim() : c.indexLabel,
+      period: typeof b.period === 'string' ? b.period.trim() : c.period,
+      phase: typeof b.phase === 'string' ? b.phase.trim() : c.phase,
+      title: typeof b.title === 'string' ? b.title.trim() : c.title,
+      organization: typeof b.organization === 'string' ? b.organization.trim() : c.organization,
+      location: typeof b.location === 'string' ? b.location.trim() : c.location,
+      summary: typeof b.summary === 'string' ? b.summary.trim() : c.summary,
+      tags: b.tags !== undefined ? asStringArray(b.tags) : c.tags,
+      published: b.published === undefined ? c.published : Boolean(b.published),
+      sortOrder: b.sortOrder !== undefined ? Number(b.sortOrder) || 0 : c.sortOrder,
+      updatedAt: new Date(),
+    })
+    .where(eq(journeyMilestones.id, id))
+    .returning();
+  res.status(200).json({ ok: true, item: updated });
+}
+
+export async function deleteAdminJourney(req: AdminRequest, res: Response): Promise<void> {
+  const id = parseId(req.params.id);
+  if (!id) {
+    res.status(400).json({ ok: false, error: 'Invalid journey milestone ID.' });
+    return;
+  }
+  await db.delete(journeyMilestones).where(eq(journeyMilestones.id, id));
   res.status(200).json({ ok: true });
 }
 
