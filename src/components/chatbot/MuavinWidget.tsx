@@ -89,26 +89,43 @@ export function MuavinWidget() {
     try {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
         body: JSON.stringify({
           message: trimmed,
           history: historyForApi,
         }),
       });
 
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data?.ok && typeof data?.reply === 'string') {
+      const rawText = await res.text();
+      let data: { ok?: boolean; reply?: unknown; error?: unknown } = {};
+      if (rawText) {
+        try {
+          const parsed = JSON.parse(rawText);
+          if (parsed && typeof parsed === 'object') {
+            data = parsed as { ok?: boolean; reply?: unknown; error?: unknown };
+          }
+        } catch {
+          data = {};
+        }
+      }
+
+      const replyText = typeof data.reply === 'string' ? data.reply.trim() : '';
+      if (res.ok && replyText.length > 0) {
         setMessages((prev) => [
           ...prev,
           {
             id: `a-${Date.now()}`,
             role: 'assistant',
-            content: data.reply,
+            content: replyText,
           },
         ]);
       } else {
+        const errText = typeof data.error === 'string' && data.error.trim() ? data.error.trim() : '';
         setErrorMsg(
-          data?.error || 'Muavin AI could not answer right now. Please try again shortly.',
+          errText || 'Muavin AI could not answer right now. Please try again shortly.',
         );
       }
     } catch {

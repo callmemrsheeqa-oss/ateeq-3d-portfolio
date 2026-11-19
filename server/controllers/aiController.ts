@@ -1,8 +1,10 @@
 import type { Request, Response } from 'express';
 import {
   askMuavinAi,
+  MuavinConfigError,
   MuavinDisabledError,
-  MuavinMissingKeyError,
+  MuavinTimeoutError,
+  MuavinUpstreamError,
   type ChatTurn,
 } from '../services/muavinService.ts';
 
@@ -52,20 +54,16 @@ export async function postAiChat(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    if (error instanceof MuavinMissingKeyError) {
-      res.status(503).json({
+    if (error instanceof MuavinConfigError) {
+      res.status(500).json({
         ok: false,
-        code: 'GEMINI_NOT_CONFIGURED',
-        error:
-          'Muavin AI requires GEMINI_API_KEY to be configured in Settings > Secrets on the server.',
+        code: 'MUAVIN_WORKER_MISCONFIGURED',
+        error: error.message,
       });
       return;
     }
 
-    const errMsg = error instanceof Error ? error.message : String(error);
-    console.error('Muavin AI error:', error);
-
-    if (errMsg.includes('MUAVIN_TIMEOUT')) {
+    if (error instanceof MuavinTimeoutError) {
       res.status(504).json({
         ok: false,
         code: 'AI_TIMEOUT',
@@ -74,48 +72,36 @@ export async function postAiChat(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    if (errMsg.includes('429') || errMsg.includes('RESOURCE_EXHAUSTED')) {
-      res.status(429).json({
+    if (error instanceof MuavinUpstreamError) {
+      console.error('Muavin Worker upstream error:', error.statusCode, error.message);
+
+      if (error.statusCode === 429) {
+        res.status(429).json({
+          ok: false,
+          code: 'RATE_LIMITED',
+          error: 'Muavin AI is busy right now. Please try again in a moment.',
+        });
+        return;
+      }
+
+      if (error.statusCode === 503) {
+        res.status(503).json({
+          ok: false,
+          code: 'AI_HIGH_DEMAND',
+          error: 'Muavin AI is experiencing temporary high demand upstream. Please try again in a moment.',
+        });
+        return;
+      }
+
+      res.status(error.statusCode >= 500 ? 502 : 400).json({
         ok: false,
-        code: 'QUOTA_EXCEEDED',
-        error: 'Gemini API rate limit or quota reached. Please try again shortly.',
+        code: 'AI_UPSTREAM_ERROR',
+        error: error.message || 'Muavin AI could not complete your request right now. Please try again.',
       });
       return;
     }
 
-    if (
-      errMsg.includes('API_KEY_INVALID') ||
-      errMsg.includes('PERMISSION_DENIED') ||
-      errMsg.includes('API key not valid') ||
-      errMsg.includes('403')
-    ) {
-      res.status(503).json({
-        ok: false,
-        code: 'GEMINI_KEY_INVALID',
-        error:
-          'Muavin AI could not authenticate with Gemini. Please verify GEMINI_API_KEY in Settings > Secrets.',
-      });
-      return;
-    }
-
-    if (errMsg.includes('NOT_FOUND') || errMsg.includes('404')) {
-      res.status(502).json({
-        ok: false,
-        code: 'MODEL_NOT_FOUND',
-        error: 'Configured Gemini model was not found upstream. Check GEMINI_MODEL configuration.',
-      });
-      return;
-    }
-
-    if (errMsg.includes('503') || errMsg.includes('UNAVAILABLE')) {
-      res.status(503).json({
-        ok: false,
-        code: 'AI_HIGH_DEMAND',
-        error: 'Muavin AI is experiencing temporary high demand upstream. Please try again in a moment.',
-      });
-      return;
-    }
-
+    console.error('Muavin AI unexpected error:', error);
     res.status(502).json({
       ok: false,
       code: 'AI_UPSTREAM_ERROR',
