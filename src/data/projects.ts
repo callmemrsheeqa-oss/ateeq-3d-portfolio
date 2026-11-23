@@ -337,6 +337,39 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     liveUrl: null,
     featured: false,
   },
+  {
+    slug: 'bzu-exam',
+    index: '11',
+    title: 'BZU Exam — Online Examination Management Prototype',
+    shortTitle: 'BZU Exam',
+    category: 'Web & Apps',
+    status: 'Built',
+    mathSymbol: 'Σ',
+    motif: 'stochastic-grid',
+    tagline: 'A futuristic university examination demo linking student submissions, teacher marking, and admin-controlled result workflows.',
+    summary:
+      'An interactive academic prototype inspired by Bahauddin Zakariya University, Multan, designed to demonstrate online exams through separate student, teacher, and administrator dashboards. Uses fictional university accounts and synthetic academic records rather than real institutional data.',
+    problem:
+      'Coordinating exam creation, time-bound student access, handwritten or typed submissions, marking, and transparent result publication can be fragmented across disconnected tools. A unified prototype helps illustrate a possible university-wide workflow without handling real student records.',
+    approach:
+      'Designed a React and TypeScript-based interface with a BZU-inspired futuristic theme, role-oriented dashboards, and a separate interactive demo flow. The proposed journey takes a paper from teacher creation through student attempts, MCQ auto-grading, PDF-based subjective review, admin-approved marks revision, and result publication. Browser-local demo data keeps the prototype free from production infrastructure.',
+    mathematicalConnection:
+      'Combines rule-based grading, weighted score aggregation and percentage calculation with scheduling constraints, countdown timers, and explicit state transitions for exam and result lifecycles.',
+    notes:
+      'Independent educational prototype, not an official BZU examination portal. Demo identities and academic records are synthetic. Intended for same-browser demonstrations; real authentication, persistent cross-device submission, and production exam security are outside the current scope. Document import, speech input, and PDF annotations may depend on browser support or implementation stage.',
+    techStack: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Browser Storage', 'PDF Workflows'],
+    features: [
+      'Role-specific student, teacher, and admin views using fictional university accounts',
+      'Teacher-designed exams, quizzes, and assignments with a calendar separate from testable demo sessions',
+      'MCQ navigation and automatic scoring alongside typed, voice-assisted, or single-PDF subjective submissions',
+      'In-browser subjective paper review, marksheets, feedback, and controlled release of checked papers',
+      'Admin review of pre-publication marks revision requests with an audit trail',
+      'Guided end-to-end examination demo, responsive dashboards, and system-aware light/dark theme',
+    ],
+    githubUrl: 'https://github.com/callmemrsheeqa-oss/BZU_EXAM',
+    liveUrl: null,
+    featured: false,
+  },
 ];
 
 export const PROJECT_CATEGORIES: Array<'All' | ProjectCategory> = [
