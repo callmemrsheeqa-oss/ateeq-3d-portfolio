@@ -146,6 +146,42 @@ async function runIdempotentSeed(): Promise<void> {
       );
     }
 
+    // Add newly published projects to an already-initialized portfolio database.
+    // Do not re-seed or overwrite existing project rows/admin edits.
+    const bzuExam = PORTFOLIO_PROJECTS.find((p) => p.slug === 'bzu-exam');
+    if (bzuExam) {
+      const existingBzuExam = await db
+        .select({ id: projects.id })
+        .from(projects)
+        .where(eq(projects.slug, bzuExam.slug))
+        .limit(1);
+      if (existingBzuExam.length === 0) {
+        await db.insert(projects).values({
+          slug: bzuExam.slug,
+          indexLabel: bzuExam.index,
+          title: bzuExam.title,
+          shortTitle: bzuExam.shortTitle,
+          category: bzuExam.category,
+          status: bzuExam.status,
+          mathSymbol: bzuExam.mathSymbol,
+          motif: bzuExam.motif,
+          tagline: bzuExam.tagline,
+          summary: bzuExam.summary,
+          problem: bzuExam.problem,
+          approach: bzuExam.approach,
+          mathematicalConnection: bzuExam.mathematicalConnection,
+          notes: bzuExam.notes,
+          techStack: bzuExam.techStack,
+          features: bzuExam.features,
+          githubUrl: bzuExam.githubUrl,
+          liveUrl: bzuExam.liveUrl,
+          featured: bzuExam.featured,
+          published: true,
+          sortOrder: 11,
+        });
+      }
+    }
+
     // 5. Migrate verified Skills if empty
     const [{ value: skillCount }] = await db.select({ value: count() }).from(skills);
     if (skillCount === 0) {
